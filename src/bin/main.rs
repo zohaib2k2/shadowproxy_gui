@@ -6,12 +6,12 @@ use egui_extras::{TableBuilder, Column};
 
 mod json_thread_listner;
 
-
+use shadowproxy_gui::utils::RequestData;
 
 struct MyApp {
     active_tab: Tab,
-    dock_collector: Arc<Mutex<Vec<json_thread_listner::RequestData>>>,
-    request_store: Arc<Mutex<Vec<json_thread_listner::RequestData>>>,
+    dock_collector: Arc<Mutex<Vec<RequestData>>>,
+    request_store: Arc<Mutex<Vec<RequestData>>>,
 
 
 }

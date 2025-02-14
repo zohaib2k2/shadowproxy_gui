@@ -10,13 +10,7 @@ struct IncomingData {
     age: u32,
 }
 
-#[derive(Debug)]
-pub struct RequestData {
-    pub request_type: String,
-    pub method: String,
-    pub url: String,
-    pub headers: String,
-}
+use shadowproxy_gui::utils::RequestData;
 
 // Function to start the Warp server
 // later i may have to pass egui object Ui to make these request visable. 
