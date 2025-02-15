@@ -2,7 +2,6 @@ use eframe::egui::{self, ScrollArea, Vec2};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use egui_extras::{TableBuilder, Column};
 
 mod json_thread_listner;
 
@@ -12,7 +11,7 @@ struct MyApp {
     active_tab: Tab,
     dock_collector: Arc<Mutex<Vec<RequestData>>>,
     request_store: Arc<Mutex<Vec<RequestData>>>,
-
+    selected_for_show: RequestData,
 
 }
 
@@ -57,7 +56,9 @@ impl Default for MyApp {
             active_tab: Tab::Recon,
             dock_collector: google_dork_collector,
             request_store: request_store,
+            selected_for_show: RequestData::empty(),
         }
+
     }
 }
 
@@ -99,14 +100,20 @@ impl MyApp {
 
 
 
-    fn proxy_tab(&self, ui: &mut egui::Ui) {
+    fn proxy_tab(&mut self, ui: &mut egui::Ui) {
         ui.label("Captured Requests:");
-
+        
+        let max_height = ui.available_height() * (0.75);
         // Make the table scroll-able both horizontally and vertically, you motherfucker.
-        ScrollArea::both().show(ui, |ui| {
+        ScrollArea::both()
+            .id_source("Proxy_table_scroll")
+            .max_height(max_height)
+            .show(ui, |ui| {
+
             egui::Grid::new("Proxy table")
                 .striped(true)
-                .min_col_width(100.0)
+                 
+                .min_col_width(20.0)
                 .show ( ui, |ui|{
                     // "Its not death, but dying which is terriable"
                     // -- Henry Fielding (1707)
@@ -122,7 +129,16 @@ impl MyApp {
                     let log = self.request_store.lock().unwrap();
 
                     for (index,entry) in log.iter().enumerate() {
-                        ui.label(format!("{}",index + 1));
+                        if ui.button(format!("{}",index + 1)).clicked(){
+                            self.selected_for_show = RequestData{request_type:entry.request_type.clone(),
+                                                                http_version:entry.http_version.clone(),
+                                                                method:entry.method.clone(),
+                                                                url:entry.url.clone(),
+                                                                headers:entry.headers.clone(),
+                                                                body:entry.body.clone()};
+                            
+                            println!("{:?}",self.selected_for_show);
+                        }
                         ui.label(&entry.method);
                         ui.label(&entry.url);
                         // Display headers as a JSON string
@@ -132,8 +148,21 @@ impl MyApp {
                         ui.end_row();
                     }
                 }
-                )
+                );
         });
+
+        ui.separator();
+        ui.separator();
+        //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
+        let bottom_window_size = [700.0,50.0];
+            
+        egui::ScrollArea::vertical()
+            .id_source("proxy_show_window_scroll")
+            .max_height(bottom_window_size[1])
+            .show(ui, |ui| { 
+                    ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
+                }
+            );
     }
 
     fn repeater_tab(&self, ui: &mut eframe::egui::Ui){

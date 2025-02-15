@@ -28,23 +28,30 @@ pub fn start_warp_server(data_store: Arc<Mutex<Vec<RequestData>>>) {
             let mut data_store = data_store_clone.lock().unwrap(); // Lock the mutex
 
                   // Debug the type of JSON received
-            if let (Some(request_type), Some(method), Some(url),Some(headers)) = (
+            if let (Some(request_type),Some(http_version) ,Some(method), Some(url),Some(headers),Some(body)) = (
                 body.get("type").and_then(Value::as_str),
+                body.get("http_version").and_then(Value::as_str),
                 body.get("method").and_then(Value::as_str),
                 body.get("url").and_then(Value::as_str),
                 body.get("headers").and_then(Value::as_str),
+                body.get("body").and_then(Value::as_str),
             ) {
+    
+                println!("{} = {}",http_version,body);
                 //For debuggin
                 /*
                 println!("Request Type: {}", request_type);
                 println!("Method: {}", method);
                 println!("URL: {}", url);
                 */
+                
                 let req_data = RequestData{
                     request_type : request_type.to_string(),
+                    http_version: http_version.to_string(),
                     method: method.to_string(),
                     url: url.to_string(),
                     headers: headers.to_string(),
+                    body: body.to_string(),
                 };
                 
                 data_store.push(req_data);

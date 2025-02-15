@@ -18,6 +18,7 @@ class CustomMitmproxyAddon:
         # Extract HTTP request details
         request_data = {
             "type": "request",
+            "http_version": str(flow.request.http_version),
             "method": str(flow.request.method),
             "url": str(flow.request.url),
             "headers": str(dict(flow.request.headers)),
