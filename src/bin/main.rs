@@ -1,6 +1,8 @@
+
 use eframe::egui::{self, ScrollArea, Vec2};
 use std::sync::{Arc, Mutex};
 use std::thread;
+use url;
 use std::time::Duration;
 
 mod json_thread_listner;
@@ -141,8 +143,22 @@ impl MyApp {
                         ui.label(&entry.method);
                         ui.label(&entry.url);
                         // Display headers as a JSON string
-                        let headers_str = format!("{:?}", entry.headers);
-                        ui.label(headers_str);
+                        // let headers_str = format!("{:?}", entry.headers);
+                        let parsed_url = url::Url::parse(&entry.url);
+
+                        match parsed_url{
+                            Ok(url) => {
+                                println!("Host: {:?}", url.host());
+                                println!("Path: {}", url.path());
+                                println!("Query: {:?}", url.query());
+                                println!("Fragment: {:?}", url.fragment());
+                            }
+                            Err(err) => {
+                                println!("Invalid Url: {}",err);
+
+                            }
+                        }
+                        
 
                         ui.end_row();
                     }
@@ -153,7 +169,7 @@ impl MyApp {
         ui.separator();
         ui.separator();
         //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
-        let bottom_window_size = [700.0,50.0];
+        let bottom_window_size = [700.0,130.0];
             
         egui::ScrollArea::vertical()
             .id_source("proxy_show_window_scroll")
