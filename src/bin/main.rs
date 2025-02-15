@@ -109,10 +109,8 @@ impl MyApp {
             .id_source("Proxy_table_scroll")
             .max_height(max_height)
             .show(ui, |ui| {
-
             egui::Grid::new("Proxy table")
                 .striped(true)
-                 
                 .min_col_width(20.0)
                 .show ( ui, |ui|{
                     // "Its not death, but dying which is terriable"
@@ -130,14 +128,15 @@ impl MyApp {
 
                     for (index,entry) in log.iter().enumerate() {
                         if ui.button(format!("{}",index + 1)).clicked(){
-                            self.selected_for_show = RequestData{request_type:entry.request_type.clone(),
-                                                                http_version:entry.http_version.clone(),
-                                                                method:entry.method.clone(),
-                                                                url:entry.url.clone(),
-                                                                headers:entry.headers.clone(),
-                                                                body:entry.body.clone()};
+                            self.selected_for_show = RequestData{
+                                    request_type:entry.request_type.clone(),
+                                    http_version:entry.http_version.clone(),
+                                    method:entry.method.clone(),
+                                    url:entry.url.clone(),
+                                    headers:entry.headers.clone(),
+                                    body:entry.body.clone()};
                             
-                            println!("{:?}",self.selected_for_show);
+                            //println!("{:?}",self.selected_for_show);
                         }
                         ui.label(&entry.method);
                         ui.label(&entry.url);
@@ -174,6 +173,6 @@ fn main() {
         initial_window_size: Some(Vec2::new(500.0, 400.0)),
         ..Default::default()
     };
-    eframe::run_native("Egui Background Task Example", options, Box::new(|_cc| Box::new(MyApp::default())));
+    let _ = eframe::run_native("Egui Background Task Example", options, Box::new(|_cc| Box::new(MyApp::default())));
 }
 
