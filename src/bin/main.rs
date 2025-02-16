@@ -1,5 +1,13 @@
-
 use eframe::egui::{self, ScrollArea, Vec2};
+
+use reqwest::Client;
+use reqwest::Method;
+use reqwest::Version;
+use tokio::runtime::Runtime;
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use std::collections::HashMap;
+use std::str::FromStr;
+use serde_json::{Value, from_str};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use url;
@@ -9,12 +17,39 @@ mod json_thread_listner;
 
 use shadowproxy_gui::utils::RequestData;
 
+fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::error::Error>> {
+    // Parse the JSON string into a serde_json::Value
+    let headers_value: Value = from_str(json_headers)?;
+
+    // Convert the Value into a HashMap<String, String>
+    let headers_map: HashMap<String, String> = headers_value
+        .as_object()
+        .ok_or("Invalid JSON object")?
+        .iter()
+        .map(|(k, v)| {
+            let value = v.as_str().ok_or("Header value is not a string")?.to_string();
+            println!("{:?} and {:?}",k,v);
+            Ok((k.to_string(), value))
+        })
+        .collect::<Result<_, Box<dyn std::error::Error>>>()?;
+
+    // Convert the HashMap into a reqwest::header::HeaderMap
+    let mut header_map = HeaderMap::new();
+    for (key, value) in headers_map {
+        let header_name = HeaderName::from_str(&key)?;
+        let header_value = HeaderValue::from_str(&value)?;
+        header_map.insert(header_name, header_value);
+    }
+
+    Ok(header_map)
+}
+
 struct MyApp {
     active_tab: Tab,
     dock_collector: Arc<Mutex<Vec<RequestData>>>,
     request_store: Arc<Mutex<Vec<RequestData>>>,
     selected_for_show: RequestData,
-
+    response_text: Arc<Mutex<String>>,
 }
 
 #[derive(PartialEq)]
@@ -59,6 +94,7 @@ impl Default for MyApp {
             dock_collector: google_dork_collector,
             request_store: request_store,
             selected_for_show: RequestData::empty(),
+            response_text: Arc::new(Mutex::new("Cliick button".to_string())),
         }
 
     }
@@ -90,11 +126,12 @@ impl eframe::App for MyApp {
         });
 
         // Request repaint to update the UI periodically
-        ctx.request_repaint();
+        ctx.request_repaint_after(Duration::from_millis(600));
     }
 }
 
 impl MyApp {
+    
     //TODO: Implement recon like google dorking
     fn capture_google_dork_tab(&self, ui: &mut egui::Ui){
 
@@ -110,6 +147,7 @@ impl MyApp {
         ScrollArea::both()
             .id_source("Proxy_table_scroll")
             .max_height(max_height)
+            .auto_shrink([false; 2])
             .show(ui, |ui| {
             egui::Grid::new("Proxy table")
                 .striped(true)
@@ -144,21 +182,6 @@ impl MyApp {
                         ui.label(&entry.url);
                         // Display headers as a JSON string
                         // let headers_str = format!("{:?}", entry.headers);
-                        let parsed_url = url::Url::parse(&entry.url);
-
-                        match parsed_url{
-                            Ok(url) => {
-                                println!("Host: {:?}", url.host());
-                                println!("Path: {}", url.path());
-                                println!("Query: {:?}", url.query());
-                                println!("Fragment: {:?}", url.fragment());
-                            }
-                            Err(err) => {
-                                println!("Invalid Url: {}",err);
-
-                            }
-                        }
-                        
 
                         ui.end_row();
                     }
@@ -168,19 +191,77 @@ impl MyApp {
 
         ui.separator();
         ui.separator();
-        //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
-        let bottom_window_size = [700.0,130.0];
+        if ui.button("Send Request").clicked(){
+            self.send_request(ui.ctx().clone());
+        }
+        ui.horizontal(|ui| {
             
-        egui::ScrollArea::vertical()
-            .id_source("proxy_show_window_scroll")
-            .max_height(bottom_window_size[1])
-            .show(ui, |ui| { 
-                    ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
-                }
-            );
+            //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
+            let bottom_window_size = [400.0,200.0];
+            
+
+            egui::ScrollArea::both()
+                .id_source("proxy_show_window_scroll")
+                .max_height(bottom_window_size[1])
+                .max_width(bottom_window_size[0])
+                .auto_shrink([false; 2])
+                .show(ui, |ui| { 
+                        ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
+                    }
+                );
+            
+            egui::ScrollArea::both()
+                .id_source("response")
+                .max_height(bottom_window_size[1])
+                .max_width(bottom_window_size[0])
+                .auto_shrink([false;2])
+                .show(ui, |ui| { 
+                        ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{}",self.response_text.lock().unwrap())));
+                    }
+                );
+        });
+
+    
     }
 
     fn repeater_tab(&self, ui: &mut eframe::egui::Ui){
+    }
+
+    fn send_request(&self, ctx: egui::Context) {
+        let selected_request = self.selected_for_show.clone();
+        let response_text = Arc::clone(&self.response_text);
+
+        std::thread::spawn(move || {
+            let runtime = Runtime::new().unwrap();
+            runtime.block_on(async {
+                let client = Client::new();
+                let req = client.request(
+                    selected_request.method.parse().unwrap(), 
+                    &selected_request.url
+                );
+
+                let req = if selected_request.body.is_empty() {
+                    req
+                } else {
+                    req.body(selected_request.body.clone())
+                };
+
+                let json_header_trans = json_to_header_map(selected_request.headers.as_str());
+                //println!("Something :{:?}",json_header_trans.unwrap());
+                //let req = req.headers(json_header_trans.unwrap());
+
+                match req.send().await {
+                    Ok(resp) => {
+                        if let Ok(text) = resp.text().await {
+                            *response_text.lock().unwrap() = text;
+                        }
+                    }
+                    Err(_) => {
+                        *response_text.lock().unwrap() = "Failed to send request".to_string();
+                    }
+                }
+            });
+        });
     }
 }
 

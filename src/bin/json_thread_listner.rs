@@ -37,7 +37,6 @@ pub fn start_warp_server(data_store: Arc<Mutex<Vec<RequestData>>>) {
                 body.get("body").and_then(Value::as_str),
             ) {
     
-                println!("{} = {}",http_version,body);
                 //For debuggin
                 /*
                 println!("Request Type: {}", request_type);

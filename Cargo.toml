@@ -6,11 +6,12 @@ path = "src/lib.rs"
 
 
 [dependencies]
-eframe = "0.21"
+eframe = "0.22"
 egui = "0.22"
 egui_extras = "0.31.0"
 env_logger = "0.11.6"
 hyper = "1.6.0"
+reqwest = "0.12.12"
 serde = "1.0.217"
 serde_json = "1.0.138"
 tokio = { version = "1.43.0", features = ["full"]}

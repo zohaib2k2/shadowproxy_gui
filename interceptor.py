@@ -42,7 +42,6 @@ class CustomMitmproxyAddon:
             "headers": dict(flow.response.headers),
             "body": flow.response.text,
         }
-        print(flow.response.text)
         # Send response data to the custom program
         # self.send_to_program(response_data)
 
