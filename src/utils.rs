@@ -4,6 +4,12 @@ use reqwest::Method;
 use std::collections::HashMap;
 use url::Url;
 
+use flate2::read::{GzDecoder, DeflateDecoder};
+use brotli::Decompressor;
+use std::io::Read;
+
+
+
 /// Represents different verisions of HTTP
 ///
 /// This enum defines the supported HTTP versions and an `Unknown` variant
@@ -142,3 +148,32 @@ impl RequestData{
     }
 }
 
+/// Decompress a response body based on the `Content-Encoding` header.
+pub fn decompress_response(body: &[u8], encoding: Option<&str>) -> Result<Vec<u8>, &'static str> {
+    match encoding {
+        Some("gzip") => {
+            let mut decoder = GzDecoder::new(body);
+            let mut decompressed = Vec::new();
+            decoder
+                .read_to_end(&mut decompressed)
+                .map_err(|_| "Failed to decompress gzip data")?;
+            Ok(decompressed)
+        }
+        Some("deflate") => {
+            let mut decoder = DeflateDecoder::new(body);
+            let mut decompressed = Vec::new();
+            decoder
+                .read_to_end(&mut decompressed)
+                .map_err(|_| "Failed to decompress deflate data")?;
+            Ok(decompressed)
+        }
+        Some("br") => {
+            let mut decompressed = Vec::new();
+            Decompressor::new(body, body.len())
+                .read_to_end(&mut decompressed)
+                .map_err(|_| "Failed to decompress brotli data")?;
+            Ok(decompressed)
+        }
+        _ => Ok(body.to_vec()), // No compression
+    }
+}
