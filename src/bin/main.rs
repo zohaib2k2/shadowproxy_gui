@@ -50,6 +50,8 @@ struct MyApp {
     request_store: Arc<Mutex<Vec<RequestData>>>,
     selected_for_show: RequestData,
     response_text: Arc<Mutex<String>>,
+    stop_proxy: bool,
+    stop_recon: bool,
 }
 
 #[derive(PartialEq)]
@@ -95,6 +97,8 @@ impl Default for MyApp {
             request_store: request_store,
             selected_for_show: RequestData::empty(),
             response_text: Arc::new(Mutex::new("Cliick button".to_string())),
+            stop_proxy: false,
+            stop_recon: false,
         }
 
     }
@@ -141,7 +145,15 @@ impl MyApp {
 
     fn proxy_tab(&mut self, ui: &mut egui::Ui) {
         ui.label("Captured Requests:");
-        
+        ui.horizontal( |ui| {
+            if ui.button("Stop").clicked(){
+                self.stop_proxy = true;
+            }
+            if ui.button("Start").clicked(){
+                self.stop_proxy = false;
+            }
+
+        }) ;   
         let max_height = ui.available_height() * (0.75);
         // Make the table scroll-able both horizontally and vertically, you motherfucker.
         ScrollArea::both()
@@ -155,7 +167,7 @@ impl MyApp {
                 .show ( ui, |ui|{
                     // "Its not death, but dying which is terriable"
                     // -- Henry Fielding (1707)
-                    
+                        
                     // Table headers
                     ui.label("Index");
                     ui.label("Method");
@@ -163,10 +175,13 @@ impl MyApp {
                     ui.label("Headers");
                     ui.end_row();
                 
-
+    
                     let log = self.request_store.lock().unwrap();
 
                     for (index,entry) in log.iter().enumerate() {
+                        if self.stop_proxy {
+                            continue;
+                        }
                         if ui.button(format!("{}",index + 1)).clicked(){
                             self.selected_for_show = RequestData{
                                     request_type:entry.request_type.clone(),
@@ -182,7 +197,6 @@ impl MyApp {
                         ui.label(&entry.url);
                         // Display headers as a JSON string
                         // let headers_str = format!("{:?}", entry.headers);
-
                         ui.end_row();
                     }
                 }
