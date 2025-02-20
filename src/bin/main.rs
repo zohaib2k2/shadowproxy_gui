@@ -303,7 +303,7 @@ impl MyApp {
                 let req = if selected_request.headers.is_empty(){
                     req
                 } else {
-                    let json_header_trans = json_to_header_map(selected_request.headers.as_str());
+                    let json_header_trans = shadowproxy_gui::utils::json_to_header_map(selected_request.headers.as_str());
                     
                     req.headers(json_header_trans.unwrap())
                 };

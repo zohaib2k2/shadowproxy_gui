@@ -8,9 +8,9 @@ use url::Url;
 use flate2::read::{GzDecoder, DeflateDecoder};
 use brotli::Decompressor;
 use std::io::Read;
-
-
-
+use reqwest::header::{HeaderMap,HeaderName,HeaderValue};
+use serde_json;
+use serde_json::Value;
 /// Represents different verisions of HTTP
 ///
 /// This enum defines the supported HTTP versions and an `Unknown` variant
@@ -84,6 +84,7 @@ pub struct RequestDataProper {
 
 impl RequestData{
     /// Creates a new `RequestData` instance with the provided fields.
+    ///
     ///
     /// # Arguments
     /// * `request_type` - The type of the request (e.g., "HTTP Request").
@@ -189,7 +190,7 @@ pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::
 
 
     // Parse the JSON string into a serde_json::Value
-    let headers_value: Value = from_str(&corrected_string)?;
+    let headers_value: Value = serde_json::from_str(&corrected_string)?;
 
     // Convert the Value into a HashMap<String, String>
     let headers_map: HashMap<String, String> = headers_value
@@ -208,7 +209,7 @@ pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::
         if key.trim().to_lowercase() == "if-modified-since" || key.trim().to_lowercase() == "if-none-match"{
             continue;
         }
-        let header_name = HeaderName::from_str(&key)?;
+        let header_name = HeaderName::from_bytes(&key.as_bytes())?;
         let header_value = HeaderValue::from_str(&value)?;
         header_map.insert(header_name, header_value);
     }
