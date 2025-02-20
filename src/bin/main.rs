@@ -44,7 +44,6 @@ fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::erro
         }
         let header_name = HeaderName::from_str(&key)?;
         let header_value = HeaderValue::from_str(&value)?;
-        println!("{} and {}",key,value);
         header_map.insert(header_name, header_value);
     }
 
@@ -247,7 +246,7 @@ impl MyApp {
                                     headers:entry.headers.clone(),
                                     body:entry.body.clone()};
                             
-                            println!("{}",self.selected_for_show.headers);
+                            //println!("{}",self.selected_for_show.headers);
                             let e1 = &self.selected_for_show.headers.replace("\"","\\\"").replace("'","\"");
                             let headers1: HashMap<String,String> = serde_json::from_str(e1).unwrap();
                             for (key, value) in headers1 {
@@ -266,14 +265,13 @@ impl MyApp {
         });
 
         ui.separator();
-        ui.separator();
         if ui.button("Send Request").clicked(){
             self.send_request(ui.ctx().clone());
         }
         ui.horizontal(|ui| {
             
             //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
-            let bottom_window_size = [400.0,200.0];
+            let bottom_window_size = [400.0,220.0];
             
 
             egui::ScrollArea::both()
@@ -351,25 +349,31 @@ impl MyApp {
                             .get("Content-Encoding")
                             .and_then(|value| value.to_str().ok())
                             .map(|s| s.to_string());
-
+                        
+                        /*
                         println!("Headers founds!!");
                         println!("================");
                         println!("Encoding {:?}",resp.headers().get("Content-Encoding"));
                         println!("{}",resp.status());
+                        */
+                        let str_found :String;
                         if let Ok(text) = resp.bytes().await {
 
                             match shadowproxy_gui::utils::decompress_response(&text,content_encoding.as_deref()) {
                                 Ok(decompressed) => {
+                                    /*
                                     println!(
                                         "Decompressed response: {}",
                                         String::from_utf8_lossy(&decompressed)
-                                    );
+                                    );*/
+                                    str_found = String::from_utf8(decompressed).expect("Failed to Convert bytes to String");
                                 }
                                 Err(e) => {
                                     eprintln!("Error: {}", e);
+                                    str_found = String::from("Wrong sequence of UTF-8 bytes.");
                                 }
                             }
-                            //*response_text.lock().unwrap() = text;
+                            *response_text.lock().unwrap() = str_found;
                         }
                     }
                     Err(_) => {
