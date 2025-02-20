@@ -4,6 +4,7 @@ use reqwest::Method;
 use std::collections::HashMap;
 use url::Url;
 
+
 use flate2::read::{GzDecoder, DeflateDecoder};
 use brotli::Decompressor;
 use std::io::Read;
@@ -69,6 +70,8 @@ pub struct RequestData {
      /// The body of the request, if any.
     pub body: String, 
 }
+
+
 
 pub struct RequestDataProper {
     pub http_version: HttpVersion,
@@ -176,4 +179,39 @@ pub fn decompress_response(body: &[u8], encoding: Option<&str>) -> Result<Vec<u8
         }
         _ => Ok(body.to_vec()), // No compression
     }
+}
+
+/// Translates the intercepted headers in string,
+/// into header. `reqwest`
+pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::error::Error>> {
+    
+    let corrected_string = json_headers.replace("\"","\\\"").replace("'","\"");
+
+
+    // Parse the JSON string into a serde_json::Value
+    let headers_value: Value = from_str(&corrected_string)?;
+
+    // Convert the Value into a HashMap<String, String>
+    let headers_map: HashMap<String, String> = headers_value
+        .as_object()
+        .ok_or("Invalid JSON object")?
+        .iter()
+        .map(|(k, v)| {
+            let value = v.as_str().ok_or("Header value is not a string")?.to_string();
+            Ok((k.to_string(), value))
+        })
+        .collect::<Result<_, Box<dyn std::error::Error>>>()?;
+
+    // Convert the HashMap into a reqwest::header::HeaderMap
+    let mut header_map = HeaderMap::new();
+    for (key, value) in headers_map {
+        if key.trim().to_lowercase() == "if-modified-since" || key.trim().to_lowercase() == "if-none-match"{
+            continue;
+        }
+        let header_name = HeaderName::from_str(&key)?;
+        let header_value = HeaderValue::from_str(&value)?;
+        header_map.insert(header_name, header_value);
+    }
+
+    Ok(header_map)
 }
