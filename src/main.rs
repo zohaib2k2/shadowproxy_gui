@@ -1,3 +1,6 @@
+//Copyright (c) 2025 Author. All Rights Reserved.
+
+
 use eframe::egui::{self, ScrollArea, Vec2};
 
 
@@ -14,9 +17,14 @@ use std::thread;
 use url;
 use std::time::Duration;
 
+mod servers;
+mod utils;
 
-use shadowproxy_gui::json_thread_listner;
-use shadowproxy_gui::utils::RequestData;
+use crate::utils::structs::RequestData;
+use crate::utils::structs::decompress_response;
+use crate::utils::structs;
+
+
 
 
 /// The `MyApp` struct represents the core application state for an `egui`-based proxy tool.
@@ -73,9 +81,10 @@ impl Default for MyApp {
 
         // Start background thread for capturing web requests
         thread::spawn(
-            move || {
-
-                json_thread_listner::start_warp_server(request_store_clone);
+            move || { 
+                servers::json_thread_listner::start_warp_server(request_store_clone);
+            
+        
             }
         );
         /*
@@ -302,7 +311,7 @@ impl MyApp {
                 let req = if selected_request.headers.is_empty(){
                     req
                 } else {
-                    let json_header_trans = shadowproxy_gui::utils::json_to_header_map(selected_request.headers.as_str());
+                    let json_header_trans = structs::json_to_header_map(selected_request.headers.as_str());
                     
                     req.headers(json_header_trans.unwrap())
                 };
@@ -328,7 +337,7 @@ impl MyApp {
                         let str_found :String;
                         if let Ok(text) = resp.bytes().await {
 
-                            match shadowproxy_gui::utils::decompress_response(&text,content_encoding.as_deref()) {
+                            match decompress_response(&text,content_encoding.as_deref()) {
                                 Ok(decompressed) => {
                                     /*
                                     println!(

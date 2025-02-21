@@ -1,3 +1,5 @@
+
+
 use warp::Filter;
 use serde::{Deserialize, Serialize};
 use tokio::runtime::Runtime;
@@ -10,7 +12,7 @@ struct IncomingData {
     age: u32,
 }
 
-use crate::utils::RequestData;
+use crate::utils::structs::RequestData;
 // Function to start the Warp server
 // later i may have to pass egui object Ui to make these request visable. 
 pub fn start_warp_server(data_store: Arc<Mutex<Vec<RequestData>>>) {
