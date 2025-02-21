@@ -10,8 +10,7 @@ struct IncomingData {
     age: u32,
 }
 
-use shadowproxy_gui::utils::RequestData;
-
+use crate::utils::RequestData;
 // Function to start the Warp server
 // later i may have to pass egui object Ui to make these request visable. 
 pub fn start_warp_server(data_store: Arc<Mutex<Vec<RequestData>>>) {

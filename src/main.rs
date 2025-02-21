@@ -15,8 +15,7 @@ use url;
 use std::time::Duration;
 
 
-mod json_thread_listner;
-
+use shadowproxy_gui::json_thread_listner;
 use shadowproxy_gui::utils::RequestData;
 
 

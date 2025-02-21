@@ -1,9 +1,6 @@
 
 
-use reqwest::Method;
 use std::collections::HashMap;
-use url::Url;
-
 
 use flate2::read::{GzDecoder, DeflateDecoder};
 use brotli::Decompressor;
@@ -11,6 +8,8 @@ use std::io::Read;
 use reqwest::header::{HeaderMap,HeaderName,HeaderValue};
 use serde_json;
 use serde_json::Value;
+
+
 /// Represents different verisions of HTTP
 ///
 /// This enum defines the supported HTTP versions and an `Unknown` variant

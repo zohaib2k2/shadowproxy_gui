@@ -26,7 +26,7 @@
    ```bash
    git clone https://github.com/zohaib2k2/shadowproxy_gui.git
    cd shadowproxy_gui
-   cargo run --bin main```
+   cargo run```
 2. **Usage**
    ```bash
    ./mitmdump --listen-port 8081 -s interceptor.py
