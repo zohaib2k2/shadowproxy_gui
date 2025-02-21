@@ -2,7 +2,6 @@
 name = "shadowproxy_gui"
 version = "0.1.1"
 edition = "2021"
-path = "src/lib.rs"
 
 [dependencies]
 brotli = "7.0.0"
