@@ -20,7 +20,7 @@ class CustomMitmproxyAddon:
             "type": "request",
             "http_version": str(flow.request.http_version),
             "method": str(flow.request.method),
-            "url": str(flow.request.url),
+            "url": str(flow.request.pretty_url),
             "headers": str(dict(flow.request.headers)),
             "body": str(flow.request.text),
         }

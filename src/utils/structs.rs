@@ -1,14 +1,9 @@
 
 
-use std::collections::HashMap;
-
-use flate2::read::{GzDecoder, DeflateDecoder};
-use brotli::Decompressor;
-use std::io::Read;
-use reqwest::header::{HeaderMap,HeaderName,HeaderValue};
+use crate::utils::converters::json_str_to_hashmap;
 use serde_json;
-use serde_json::Value;
-
+use std::fmt;
+use std::collections::HashMap;
 
 /// Represents different verisions of HTTP
 ///
@@ -76,7 +71,7 @@ pub struct RequestDataProper {
     pub http_version: HttpVersion,
     pub method: HttpMethod,
     pub url: String,
-    pub headers: String,
+    pub headers: HashMap<String,String>,
     pub body: String,
 }
 
@@ -149,69 +144,82 @@ impl RequestData{
     pub fn clone(&self)->RequestData{
         RequestData::new(self.request_type.clone(),self.http_version.clone(),self.method.clone(),self.url.clone(),self.headers.clone(),self.body.clone())
     }
+    /* 
+    pub fn to_RequestData(request_str : String) -> RequestData{
+        
+
+    }*/
 }
 
-/// Decompress a response body based on the `Content-Encoding` header.
-pub fn decompress_response(body: &[u8], encoding: Option<&str>) -> Result<Vec<u8>, &'static str> {
-    match encoding {
-        Some("gzip") => {
-            let mut decoder = GzDecoder::new(body);
-            let mut decompressed = Vec::new();
-            decoder
-                .read_to_end(&mut decompressed)
-                .map_err(|_| "Failed to decompress gzip data")?;
-            Ok(decompressed)
+
+impl fmt::Display for RequestData{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut out_put = String::new();
+
+        let parsed_url = match url::Url::parse(&self.url){
+            Ok(url) => url,
+            Err(_) => {
+                out_put.push_str(&format!("Invalid URL: {}\n",self.url));
+                return writeln!(f, "Invalid URL: {}", self.url)
+            },
+        };
+
+        match parsed_url.fragment() {
+            Some(frag) => {
+                out_put.push_str(&format!("{} {}#{} {}\n",self.method,parsed_url.path(),frag,self.http_version));
+
+            }
+            None => {
+
+                out_put.push_str(&format!("{} {} {}\n",self.method,parsed_url.path(),self.http_version));
+            }
         }
-        Some("deflate") => {
-            let mut decoder = DeflateDecoder::new(body);
-            let mut decompressed = Vec::new();
-            decoder
-                .read_to_end(&mut decompressed)
-                .map_err(|_| "Failed to decompress deflate data")?;
-            Ok(decompressed)
+
+
+        if let Some(host) = parsed_url.host() {
+            out_put.push_str(&format!("Host: {}\n",host));
+        } else {
+            out_put.push_str("Host: (none)\n");
         }
-        Some("br") => {
-            let mut decompressed = Vec::new();
-            Decompressor::new(body, body.len())
-                .read_to_end(&mut decompressed)
-                .map_err(|_| "Failed to decompress brotli data")?;
-            Ok(decompressed)
+
+        let hashmap = match json_str_to_hashmap(self.headers.as_str()){
+            Ok(map) => map,
+            Err(e) => {
+                out_put.push_str(&format!("Failed to parse headers: {}\n",e));
+                return write!(f,"{}",out_put);
+            }
+        };
+        
+        for (key, value) in hashmap.iter(){
+            out_put.push_str(&format!("{}: {}\n",key,value));
         }
-        _ => Ok(body.to_vec()), // No compression
+
+        out_put.push_str("\n");
+        
+        if !self.body.is_empty(){
+            out_put.push_str(&format!("{}\n",self.body));
+        }
+
+        write!(f, "{}",out_put)?;
+        Ok(()) 
     }
 }
 
-/// Translates the intercepted headers in string,
-/// into header. `reqwest`
-pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::error::Error>> {
-    
-    let corrected_string = json_headers.replace("\"","\\\"").replace("'","\"");
-
-
-    // Parse the JSON string into a serde_json::Value
-    let headers_value: Value = serde_json::from_str(&corrected_string)?;
-
-    // Convert the Value into a HashMap<String, String>
-    let headers_map: HashMap<String, String> = headers_value
-        .as_object()
-        .ok_or("Invalid JSON object")?
-        .iter()
-        .map(|(k, v)| {
-            let value = v.as_str().ok_or("Header value is not a string")?.to_string();
-            Ok((k.to_string(), value))
-        })
-        .collect::<Result<_, Box<dyn std::error::Error>>>()?;
-
-    // Convert the HashMap into a reqwest::header::HeaderMap
-    let mut header_map = HeaderMap::new();
-    for (key, value) in headers_map {
-        if key.trim().to_lowercase() == "if-modified-since" || key.trim().to_lowercase() == "if-none-match"{
-            continue;
+impl RequestDataProper {
+    pub fn new(http_version: HttpVersion, method: HttpMethod, url: String,headers: HashMap<String, String>,body: String) -> Self {
+        RequestDataProper {
+            http_version,
+            method,
+            url,
+            headers,
+            body,
         }
-        let header_name = HeaderName::from_bytes(&key.as_bytes())?;
-        let header_value = HeaderValue::from_str(&value)?;
-        header_map.insert(header_name, header_value);
     }
 
-    Ok(header_map)
+    /*
+    pub fn from_string(request_str: String) -> Self {
+
+    }*/
+
 }
+

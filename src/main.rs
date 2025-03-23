@@ -1,16 +1,30 @@
-//Copyright (c) 2025 Author. All Rights Reserved.
-
+/*
+ * Copyright (C) [2025] [Zohaib Zafar]
+ *
+ * 
+ * This program is free software:
+ * not just free as in free beer but also 'free' as in freedom.
+ * you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 use eframe::egui::{self, ScrollArea, Vec2};
 
 
 use reqwest::Client;
-use reqwest::Method;
-use reqwest::Version;
 use tokio::runtime::Runtime;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use std::collections::HashMap;
-use std::str::FromStr;
 use serde_json::{Value, from_str};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -21,10 +35,12 @@ mod servers;
 mod utils;
 
 use crate::utils::structs::RequestData;
-use crate::utils::structs::decompress_response;
-use crate::utils::structs;
+use crate::utils::converters::decompress_response;
 
+use log::{info, warn, error};
+use log4rs;
 
+/// A basic logger for all the activities.
 
 
 /// The `MyApp` struct represents the core application state for an `egui`-based proxy tool.
@@ -49,6 +65,12 @@ struct MyApp {
     /// This allows multiple parts of the UI to access or modify the response.
     response_text: Arc<Mutex<String>>,
 
+    repeater_request: Arc<Mutex<Vec<RequestData>>>,
+
+    selected_repeater_request: RequestData,
+    selected_repeater_request_text : String,
+
+    repeater_response: Arc<Mutex<String>>,
      /// A flag to indicate whether the proxy should stop running.
     /// `true` means the proxy should stop; `false` means it's active.
     stop_proxy: bool,
@@ -56,6 +78,9 @@ struct MyApp {
     /// A flag to indicate whether the reconnaissance process should stop.
     /// `true` means recon should stop; `false` means it's active.
     stop_recon: bool,
+    
+    show_proxy_context_menu: bool,
+
 }
 
 #[derive(PartialEq)]
@@ -78,13 +103,13 @@ impl Default for MyApp {
         let google_dork_collector = Arc::new(Mutex::new(vec![]));
         let google_dork_collector_clone = Arc::clone(&google_dork_collector); 
 
+        let repeater_request = Arc::new(Mutex::new(vec![]));
+        let repeater_request_clone = Arc::clone(&repeater_request);
 
         // Start background thread for capturing web requests
         thread::spawn(
             move || { 
                 servers::json_thread_listner::start_warp_server(request_store_clone);
-            
-        
             }
         );
         /*
@@ -104,9 +129,14 @@ impl Default for MyApp {
             dock_collector: google_dork_collector,
             request_store: request_store,
             selected_for_show: RequestData::empty(),
+            repeater_request: repeater_request,
+            selected_repeater_request: RequestData::empty(),
+            repeater_response: Arc::new(Mutex::new("".to_string())),
             response_text: Arc::new(Mutex::new("Cliick button".to_string())),
             stop_proxy: false,
             stop_recon: false,
+            show_proxy_context_menu: false,
+            selected_repeater_request_text : String::from(""),
         }
 
     }
@@ -243,22 +273,46 @@ impl MyApp {
         });
 
         ui.separator();
-        if ui.button("Send Request").clicked(){
-            self.send_request(ui.ctx().clone());
-        }
+        ui.horizontal( |ui| {
+            if ui.button("Send Request").clicked(){
+                let selected_req_for_show = self.selected_for_show.clone();
+                self.send_request(ui.ctx().clone(),selected_req_for_show,Tab::Proxy);
+            }
+            if ui.button("Send to repeater").clicked(){
+                self.selected_repeater_request = self.selected_for_show.clone(); 
+
+                self.update_selected_text(); 
+            }
+
+        });
         ui.horizontal(|ui| {
             
             //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
-            let bottom_window_size = [400.0,220.0];
+            let bottom_window_size = [500.0,185.0];
             
 
             egui::ScrollArea::both()
                 .id_source("proxy_show_window_scroll")
                 .max_height(bottom_window_size[1])
+                .min_scrolled_width(bottom_window_size[0])
                 .max_width(bottom_window_size[0])
-                .auto_shrink([false; 2])
+                .min_scrolled_height(bottom_window_size[1])
                 .show(ui, |ui| { 
-                        ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
+                       let ui_resp = ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
+                       if ui_resp.clicked_by(egui::PointerButton::Secondary) {
+                           self.show_proxy_context_menu = true;
+                       }
+
+                       if self.show_proxy_context_menu {
+                           egui::menu::bar(ui, |ui| {
+                                ui.menu_button("Context Menu", |ui|{
+                                    if ui.button("Copy").clicked(){
+                                        ui.output_mut(|o| o.copied_text = "Hello world!".to_string())
+                                    }
+                                })
+                           }
+                           );
+                       }
                     }
                 );
             
@@ -266,9 +320,9 @@ impl MyApp {
                 .id_source("response")
                 .max_height(bottom_window_size[1])
                 .max_width(bottom_window_size[0])
-                .auto_shrink([false;2])
                 .show(ui, |ui| { 
-                        ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{}",self.response_text.lock().unwrap())));
+                        let ui_resp = ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{}",self.response_text.lock().unwrap())));
+
                     }
                 );
         });
@@ -279,8 +333,61 @@ impl MyApp {
     ///
     /// This function is responsible for rendering the UI elements of the
     /// request repeater feature.
-    fn repeater_tab(&self, ui: &mut eframe::egui::Ui){
+    fn repeater_tab(&mut self, ui: &mut eframe::egui::Ui){
+        ui.separator();
+    
+        let available_height = ui.available_height();
+        let available_width = ui.available_width();
+        ui.horizontal( |ui| {
+            if ui.button("Send").clicked(){
+                self.send_request(ui.ctx().clone(),self.selected_repeater_request.clone(),Tab::Repeater);
+            }
+            if ui.button("Print Req").clicked(){
+                println!("{}",self.selected_repeater_request_text);
+            }
+        });
+
+        ui.horizontal( |ui| {
+            egui::ScrollArea::both()
+                .id_source("request_rep")
+                .max_height(available_height * 0.95)
+                .max_width(available_width/2.0)
+                .min_scrolled_height(available_height)
+                .show(ui, |ui| {
+                    ui.add_sized([available_width/2.0, available_height*0.95],
+                        egui::TextEdit::multiline(&mut self.selected_repeater_request_text)
+                            .desired_width(f32::INFINITY)
+                        );
+                    });
+            egui::ScrollArea::both()
+                .id_source("respone_rep")
+                .max_height(available_height * 0.95)
+                .max_width(available_width/2.0)
+                .min_scrolled_height(available_height)
+                .show(ui, |ui| {
+                    // Yar ab ma kud-kooshi kar lon ga muj se 
+                    // nai banta gui.
+                    ui.add_sized([available_width/2.0, available_height*0.95],
+
+                        egui::TextEdit::multiline(&mut self.repeater_response.lock().unwrap().to_string())
+                            .desired_width(f32::INFINITY));
+                    
+                    });
+                
+
+        });
+            
+
+
+
     }
+    
+    fn update_selected_text(&mut self){
+        self.selected_repeater_request_text = self.selected_repeater_request.to_string();
+
+    }
+
+
 
     /// Sends the currently selected request asynchronously.
     ///
@@ -289,9 +396,19 @@ impl MyApp {
     /// - Attaches headers and request body if provided.
     /// - Updates `response_text` with the server's response or an error message.
     /// - Runs the request in a separate thread to avoid blocking the UI.
-    fn send_request(&self, ctx: egui::Context) {
-        let selected_request = self.selected_for_show.clone();
-        let response_text = Arc::clone(&self.response_text);
+    fn send_request(&self, ctx: egui::Context, selected_req: RequestData,tab: Tab) {
+        let selected_request = selected_req;
+
+        let response_text = match tab {
+            Tab::Proxy =>  Arc::clone(&self.response_text),
+            Tab::Repeater => Arc::clone(&self.repeater_response),
+            _ => {
+                info!("Wrong tab!");
+                panic!();
+            }
+        };
+            
+        
 
         std::thread::spawn(move || {
             let runtime = Runtime::new().unwrap();
@@ -311,8 +428,8 @@ impl MyApp {
                 let req = if selected_request.headers.is_empty(){
                     req
                 } else {
-                    let json_header_trans = structs::json_to_header_map(selected_request.headers.as_str());
-                    
+                    let json_header_trans = crate::utils::converters::json_to_header_map(selected_request.headers.as_str());
+                    // okay so this implies that ProperRequestData would have HashMap as its 
                     req.headers(json_header_trans.unwrap())
                 };
 
@@ -351,7 +468,9 @@ impl MyApp {
                                     str_found = String::from("Wrong sequence of UTF-8 bytes.");
                                 }
                             }
-                            *response_text.lock().unwrap() = str_found;
+
+                             *response_text.lock().unwrap() = str_found;
+                                
                         }
                     }
                     Err(_) => {
@@ -364,6 +483,9 @@ impl MyApp {
 }
 
 fn main() {
+    log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
+
+    info!("Application Starting");
     let options = eframe::NativeOptions {
         initial_window_size: Some(Vec2::new(500.0, 400.0)),
         ..Default::default()

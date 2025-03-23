@@ -34,16 +34,17 @@ pub fn start_warp_server(data_store: Arc<Mutex<Vec<RequestData>>>) {
                 body.get("http_version").and_then(Value::as_str),
                 body.get("method").and_then(Value::as_str),
                 body.get("url").and_then(Value::as_str),
+
                 body.get("headers").and_then(Value::as_str),
                 body.get("body").and_then(Value::as_str),
             ) {
     
                 //For debuggin
-                /*
-                println!("Request Type: {}", request_type);
-                println!("Method: {}", method);
-                println!("URL: {}", url);
-                */
+                
+                //println!("Request Type: {}", request_type);
+                //println!("Method: {}", method);
+                //println!("URL: {}", url);
+                
                 
                 let req_data = RequestData{
                     request_type : request_type.to_string(),
