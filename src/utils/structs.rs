@@ -1,15 +1,18 @@
 
 
 use crate::utils::converters::json_str_to_hashmap;
+use egui::TextBuffer;
 use serde_json;
 use std::fmt;
 use std::collections::HashMap;
+use std::str::FromStr;
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 
 /// Represents different verisions of HTTP
 ///
 /// This enum defines the supported HTTP versions and an `Unknown` variant
 /// for handling unsupported or unrecognized versions.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq,Clone)]
 pub enum HttpVersion {
     /// Represents HTTP/0.9, the initial version of HTTP.
     Http0_9,
@@ -27,7 +30,7 @@ pub enum HttpVersion {
 ///
 /// This enum defines the standard HTTP methods used to indicate the desired
 /// action to be performed on a resource.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq,Clone,Copy)]
 pub enum HttpMethod {
     /// Requests a representation of the specified resource.
     GET,
@@ -49,7 +52,7 @@ pub enum HttpMethod {
 ///
 /// This struct encapsulates the components of an HTTP request, including the
 /// request type, HTTP version, method, URL, headers, and body.
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct RequestData {
     /// The type of the request (e.g., "HTTP Request").
     pub request_type: String,
@@ -66,13 +69,51 @@ pub struct RequestData {
 }
 
 
-
+#[derive(Debug,Clone)]
 pub struct RequestDataProper {
     pub http_version: HttpVersion,
     pub method: HttpMethod,
     pub url: String,
     pub headers: HashMap<String,String>,
     pub body: String,
+}
+
+
+
+impl FromStr for RequestData {
+    type Err = String;
+
+    fn from_str(raw: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = raw.trim().split("\n\n").collect();
+       
+
+        let headers_and_start = parts[0];
+        let body = parts[1..].join("\n\n");
+
+        let mut lines = headers_and_start.lines();
+        let request_line = lines.next().ok_or("Missing request line")?;
+        let host_line =lines.next().ok_or("No host line")?;
+        let split_hostline:Vec<String> = host_line.split(":").map(|l|l.to_string()).collect();
+        let host = split_hostline.get(1).unwrap();
+        let mut parts = request_line.split_whitespace();
+
+        let method = parts.next().ok_or("missing method")?.to_string();
+        let url = parts.next().ok_or("Missing url")?.to_string();
+        let http_version = parts.next().ok_or("missing http version")?.to_string();
+
+        let headers: Vec<String> = lines.map(|line| line.trim().to_string()).collect();
+        let headers_string = headers.join("\n");
+        let full_url = format!("https://{}{}",host.trim(),url.trim());
+
+        Ok(RequestData {
+            request_type: "HTTP Request".to_string(),
+            http_version,
+            method,
+            url: full_url,
+            headers: headers_string,
+            body: body.trim().to_string(),
+        })
+    }
 }
 
 
@@ -160,18 +201,23 @@ impl fmt::Display for RequestData{
             Ok(url) => url,
             Err(_) => {
                 out_put.push_str(&format!("Invalid URL: {}\n",self.url));
-                return writeln!(f, "Invalid URL: {}", self.url)
+                return writeln!(f, "Invalid URL eat shit: {}", self.url)
             },
         };
 
         match parsed_url.fragment() {
             Some(frag) => {
-                out_put.push_str(&format!("{} {}#{} {}\n",self.method,parsed_url.path(),frag,self.http_version));
+                out_put.push_str(&format!("{} {}{}#{} {}\n",self.method,parsed_url.path(),parsed_url.query().unwrap_or(""),frag,self.http_version));
 
             }
             None => {
 
-                out_put.push_str(&format!("{} {} {}\n",self.method,parsed_url.path(),self.http_version));
+                if parsed_url.query().is_none() {
+                    out_put.push_str(&format!("{} {} {}\n",self.method,parsed_url.path(),self.http_version));
+                } else {
+                    
+                    out_put.push_str(&format!("{} {}?{} {}\n",self.method,parsed_url.path(),parsed_url.query().unwrap_or(""),self.http_version));
+                }
             }
         }
 
@@ -185,8 +231,27 @@ impl fmt::Display for RequestData{
         let hashmap = match json_str_to_hashmap(self.headers.as_str()){
             Ok(map) => map,
             Err(e) => {
-                out_put.push_str(&format!("Failed to parse headers: {}\n",e));
-                return write!(f,"{}",out_put);
+                println!("Errored Header:[{}]",self.headers.as_str());
+                out_put.push_str(&format!("Failed to parse headers another L for me: {}\n",e));
+                //return write!(f,"{}",out_put);
+                let lines = self.headers.lines();
+                let mut hm:HashMap<String, String> = HashMap::new();
+
+                for line in lines {
+                    let kv = line.split_once(":").unwrap();
+
+                    hm.insert(kv.0.to_string(), kv.1.to_string());
+                    
+                }
+
+                let hmc = hm.clone();
+
+                for (k,v) in hmc {
+                    println!("DEBUG:");
+                    println!("{} {}",k,v);
+                } 
+
+                hm
             }
         };
         
@@ -205,21 +270,136 @@ impl fmt::Display for RequestData{
     }
 }
 
-impl RequestDataProper {
-    pub fn new(http_version: HttpVersion, method: HttpMethod, url: String,headers: HashMap<String, String>,body: String) -> Self {
-        RequestDataProper {
-            http_version,
-            method,
-            url,
-            headers,
-            body,
+
+
+impl FromStr for HttpVersion {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "HTTP/0.9" => Ok(HttpVersion::Http0_9),
+            "HTTP/1.1" => Ok(HttpVersion::Http1_1),
+            "HTTP/2.0" => Ok(HttpVersion::Http2_0),
+            "HTTP/3.0" => Ok(HttpVersion::Http3_0),
+            _ => Ok(HttpVersion::Unknown),
         }
     }
-
-    /*
-    pub fn from_string(request_str: String) -> Self {
-
-    }*/
-
 }
 
+impl FromStr for HttpMethod {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "GET" => Ok(HttpMethod::GET),
+            "POST" => Ok(HttpMethod::POST),
+            "PUT" => Ok(HttpMethod::PUT),
+            "DELETE" => Ok(HttpMethod::DELETE),
+            "OPTIONS" => Ok(HttpMethod::OPTIONS),
+            "CONNECT" => Ok(HttpMethod::CONNECT),
+            "TRACE" => Ok(HttpMethod::TRACE),
+            "Invalid" => {
+                println!("Invalid shit, get your shit together!!");
+                panic!();
+            }
+            _ => Err(format!("Unsupported HTTP method zzz worng shit: {}", s.to_string())),
+        }
+    }
+}
+
+impl FromStr for RequestDataProper {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut lines = s.lines().filter(|line| !line.trim().is_empty());
+        
+        // Parse request line
+        let request_line = lines.next().ok_or("Missing request line")?;
+        let mut parts = request_line.split_whitespace();
+        let method = parts.next().ok_or("Missing HTTP method")?.trim().parse()?;
+        let url = parts.next().ok_or("Missing URL")?.to_string();
+        let http_version = parts.next().ok_or("Missing HTTP version")?.parse()?;
+
+        // Parse headers
+        let mut headers = HashMap::new();
+        let mut body_lines = Vec::new();
+        let mut is_body = false;
+        let mut host = "";
+
+        for line in lines {
+            if line.is_empty() {
+                is_body = true;
+                continue;
+            }
+            
+            if is_body {
+                body_lines.push(line);
+            } else if let Some((key, value)) = line.split_once(": ") {
+                if key.eq_ignore_ascii_case("Host") {
+                    host = value;
+                } else {
+                    headers.insert(key.to_string(), value.to_string());
+                }
+            }
+        }
+        
+        let body = s.to_string().split("\n\n").nth(1).map(str::trim).filter(|&x| !x.is_empty()).unwrap_or("").to_string();
+        let scheme = match http_version {
+            HttpVersion::Http0_9 | HttpVersion::Http1_1 => "http",
+            HttpVersion::Http2_0 | HttpVersion::Http3_0 => "https",
+            _ => "http", // Default to HTTP if unknown
+        };
+        let full_url = format!("{}://{}/{}", scheme, host.trim().trim_end_matches("/").trim_start_matches("/"), url.trim().trim_end_matches("/").trim_start_matches("/"));    
+    
+
+        Ok(RequestDataProper {
+            http_version,
+            method,
+            url: full_url,
+            headers,
+            body,
+        })
+    }
+}
+
+
+pub trait IntoHeaderMap {
+    fn parse(self) -> HeaderMap;
+}
+
+pub trait IntoMethod {
+    fn parse(self) -> reqwest::Method;
+}
+
+impl IntoMethod for HttpMethod {
+    fn parse(self) -> reqwest::Method {
+        match self {
+            HttpMethod::GET => reqwest::Method::GET,
+            HttpMethod::POST => reqwest::Method::POST,
+            HttpMethod::CONNECT => reqwest::Method::CONNECT,
+            HttpMethod::DELETE => reqwest::Method::DELETE,
+            HttpMethod::PUT => reqwest::Method::PUT,
+            HttpMethod::OPTIONS => reqwest::Method::OPTIONS,
+            HttpMethod::TRACE => reqwest::Method::TRACE,
+        }
+    }
+}
+
+impl IntoHeaderMap for HashMap<String, String> {
+    fn parse(self) -> HeaderMap {
+        let mut header_map = HeaderMap::new();
+
+        for (key, value) in self {
+            if let (Ok(name), Ok(val)) = (
+                HeaderName::from_bytes(key.as_bytes()),
+                HeaderValue::from_str(&value),
+            ) {
+                header_map.insert(name, val);
+            } else {
+                eprintln!("Invalid header: {}: {}", key, value);
+            }
+        }
+
+        header_map
+    }
+}

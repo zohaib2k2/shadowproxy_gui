@@ -24,10 +24,11 @@ use eframe::egui::{self, ScrollArea, Vec2};
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use utils::structs::{IntoHeaderMap, IntoMethod, RequestDataProper};
 use std::collections::HashMap;
 use serde_json::{Value, from_str};
 use std::sync::{Arc, Mutex};
-use std::thread;
+use std::{thread, vec};
 use url;
 use std::time::Duration;
 
@@ -50,9 +51,12 @@ struct MyApp {
     /// The currently active tab in the UI.
     active_tab: Tab,
 
+    /// Search url
+    search_url : String,
+
     /// A shared, thread-safe collection for storing intercepted HTTP requests.
     /// Used to temporarily collect requests before they are processed.
-    dock_collector: Arc<Mutex<Vec<RequestData>>>,
+    dock_collector: Arc<Mutex<Vec<String>>>,
 
     /// A shared, thread-safe storage for all captured HTTP requests.
     /// This stores the main history of intercepted requests.
@@ -112,6 +116,12 @@ impl Default for MyApp {
                 servers::json_thread_listner::start_warp_server(request_store_clone);
             }
         );
+
+        // thread::spawn(
+        //     move || {
+        //         servers::dorklistiner::start_link_server(google_dork_collector_clone);
+        //     }
+        // );
         /*
         thread::spawn(move || {
             let mut count = 0;
@@ -137,6 +147,7 @@ impl Default for MyApp {
             stop_recon: false,
             show_proxy_context_menu: false,
             selected_repeater_request_text : String::from(""),
+            search_url : String::from("")
         }
 
     }
@@ -219,6 +230,11 @@ impl MyApp {
         }) ;   
         let max_height = ui.available_height() * (0.75);
         // Make the table scroll-able both horizontally and vertically, you motherfucker.
+        ui.add(
+        egui::TextEdit::singleline(&mut self.search_url)
+            .hint_text("Type to search url...")
+            .desired_width(200.0)
+        );
         ScrollArea::both()
             .id_source("Proxy_table_scroll")
             .max_height(max_height)
@@ -245,28 +261,30 @@ impl MyApp {
                         if self.stop_proxy {
                             continue;
                         }
-                        if ui.button(format!("{}",index + 1)).clicked(){
-                            self.selected_for_show = RequestData{
-                                    request_type:entry.request_type.clone(),
-                                    http_version:entry.http_version.clone(),
-                                    method:entry.method.clone(),
-                                    url:entry.url.clone(),
-                                    headers:entry.headers.clone(),
-                                    body:entry.body.clone()};
-                            
-                            //println!("{}",self.selected_for_show.headers);
-                            let e1 = &self.selected_for_show.headers.replace("\"","\\\"").replace("'","\"");
-                            let headers1: HashMap<String,String> = serde_json::from_str(e1).unwrap();
-                            for (key, value) in headers1 {
-                                println!("{}: {}", key, value);
-                            }
+                        if entry.url.clone().contains(&self.search_url) {
+                            if ui.button(format!("{}",index + 1)).clicked(){
+                                self.selected_for_show = RequestData{
+                                        request_type:entry.request_type.clone(),
+                                        http_version:entry.http_version.clone(),
+                                        method:entry.method.clone(),
+                                        url:entry.url.clone(),
+                                        headers:entry.headers.clone(),
+                                        body:entry.body.clone()};
+                                
+                                //println!("{}",self.selected_for_show.headers);
+                                let e1 = &self.selected_for_show.headers.replace("\"","\\\"").replace("'","\"");
+                                let headers1: HashMap<String,String> = serde_json::from_str(e1).unwrap();
+                                for (key, value) in headers1 {
+                                    println!("{}: {}", key, value);
+                                }
 
+                            }
+                            ui.label(&entry.method);
+                            ui.label(&entry.url);
+                            // Display headers as a JSON string
+                            // let headers_str = format!("{:?}", entry.headers);
+                            ui.end_row();
                         }
-                        ui.label(&entry.method);
-                        ui.label(&entry.url);
-                        // Display headers as a JSON string
-                        // let headers_str = format!("{:?}", entry.headers);
-                        ui.end_row();
                     }
                 }
                 );
@@ -276,12 +294,13 @@ impl MyApp {
         ui.horizontal( |ui| {
             if ui.button("Send Request").clicked(){
                 let selected_req_for_show = self.selected_for_show.clone();
+              
                 self.send_request(ui.ctx().clone(),selected_req_for_show,Tab::Proxy);
             }
             if ui.button("Send to repeater").clicked(){
-                self.selected_repeater_request = self.selected_for_show.clone(); 
-
                 self.update_selected_text(); 
+                self.selected_repeater_request = self.selected_for_show.clone();
+
             }
 
         });
@@ -340,10 +359,28 @@ impl MyApp {
         let available_width = ui.available_width();
         ui.horizontal( |ui| {
             if ui.button("Send").clicked(){
+
                 self.send_request(ui.ctx().clone(),self.selected_repeater_request.clone(),Tab::Repeater);
+                let _n = self.selected_repeater_request_text.clone();
+
+                //println!("\n\n\nString: {}",_n);
+                let pased_request = self.selected_repeater_request_text.parse::<RequestData>();
+                let _v = self.selected_repeater_request.clone();
+                //println!("selected for show: _v \n{:?}",_v);
+                match pased_request {
+                    Ok(parsed) => {
+                        self.selected_repeater_request = parsed;
+                    },
+                    Err(err_str) => {
+                        *self.repeater_response.lock().unwrap() = err_str;
+                    }
+                }
             }
             if ui.button("Print Req").clicked(){
                 println!("{}",self.selected_repeater_request_text);
+            }
+            if ui.button("Print resp").clicked() {
+                println!("{}",self.repeater_response.lock().unwrap())
             }
         });
 
@@ -383,6 +420,8 @@ impl MyApp {
     }
     
     fn update_selected_text(&mut self){
+        println!("\n\n\nupdate: {:?}",self.selected_repeater_request);
+        println!("\n\n\nupdate .to_string: {:?}",self.selected_repeater_request.to_string());
         self.selected_repeater_request_text = self.selected_repeater_request.to_string();
 
     }
@@ -396,7 +435,8 @@ impl MyApp {
     /// - Attaches headers and request body if provided.
     /// - Updates `response_text` with the server's response or an error message.
     /// - Runs the request in a separate thread to avoid blocking the UI.
-    fn send_request(&self, ctx: egui::Context, selected_req: RequestData,tab: Tab) {
+
+	fn send_request(&self, ctx: egui::Context, selected_req: RequestData,tab: Tab) {
         let selected_request = selected_req;
 
         let response_text = match tab {
@@ -413,25 +453,60 @@ impl MyApp {
         std::thread::spawn(move || {
             let runtime = Runtime::new().unwrap();
             runtime.block_on(async {
-                let client = Client::new();
-                let req = client.request(
-                    selected_request.method.parse().unwrap(), 
-                    &selected_request.url
-                );
+                    let client = Client::new();
 
-                let req = if selected_request.body.is_empty() {
-                    req
-                } else {
-                    req.body(selected_request.body.clone())
-                };
+                        let req = match tab{
+                            Tab::Proxy => {
+                                let req =client.request(
+                                    selected_request.method.parse().unwrap(), 
+                                    &selected_request.url
+                                );
 
-                let req = if selected_request.headers.is_empty(){
-                    req
-                } else {
-                    let json_header_trans = crate::utils::converters::json_to_header_map(selected_request.headers.as_str());
-                    // okay so this implies that ProperRequestData would have HashMap as its 
-                    req.headers(json_header_trans.unwrap())
-                };
+                                let req = if selected_request.body.is_empty() {
+                                    req
+                                } else {
+                                    req.body(selected_request.body.clone())
+                                };
+
+                                let req = if selected_request.headers.is_empty(){
+                                    req
+                                } else {
+                                    let json_header_trans = crate::utils::converters::json_to_header_map(selected_request.headers.as_str());
+                                    // okay so this implies that ProperRequestData would have HashMap as its 
+                                    req.headers(json_header_trans.unwrap())
+                                
+                                };
+                                req
+                            },
+                            Tab::Repeater => {
+                                let selected_request = selected_request.to_string();
+                                let v = selected_request.clone();
+                                println!("{:?}",v);
+                                let parsed = selected_request.parse::<RequestDataProper>().unwrap();
+                                
+                                let req = client.request(parsed.method.parse(), parsed.clone().url);
+                                println!("DEBUG URL: {}",parsed.clone().url);
+                                let req = if parsed.body.is_empty() {
+                                    req
+                                } else {
+                                    req.body(parsed.body)
+                                };
+                                
+                                let req = if parsed.headers.is_empty() {
+                                    req
+                                } else {
+                                    req.headers(parsed.headers.parse())
+                                };
+
+                                req
+
+                            },
+                            Tab::Recon => {
+                                panic!("");
+                            }
+
+
+                        };
 
                 
 
@@ -468,13 +543,14 @@ impl MyApp {
                                     str_found = String::from("Wrong sequence of UTF-8 bytes.");
                                 }
                             }
+                           
+                            *response_text.lock().unwrap() = str_found;
 
-                             *response_text.lock().unwrap() = str_found;
-                                
+                            
                         }
                     }
                     Err(_) => {
-                        *response_text.lock().unwrap() = "Failed to send request".to_string();
+                        *response_text.lock().unwrap() = "Failed to send request, check your internet connection OR network Setting.".to_string();
                     }
                 }
             });
@@ -491,5 +567,14 @@ fn main() {
         ..Default::default()
     };
     let _ = eframe::run_native("Egui Background Task Example", options, Box::new(|_cc| Box::new(MyApp::default())));
+    let i = 32;
+	
+
+    let v = String::new();
+	
+
+
+
+
 }
 
