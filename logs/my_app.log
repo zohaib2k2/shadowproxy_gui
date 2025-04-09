@@ -2594,3 +2594,395 @@
 2025-04-09T04:25:06.071027313+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
 2025-04-09T04:25:06.071090966+05:00 INFO warp::server - listening on http://0.0.0.0:5000
 2025-04-09T04:25:06.071500319+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:38:45.314216663+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T11:38:45.418216066+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T11:38:45.460237600+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:38:45.460448546+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:38:45.460616570+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:38:45.460746672+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:38:45.460864165+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:38:45.461050802+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:38:45.462262676+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:38:45.467179195+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:38:45.467342104+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:38:45.467435225+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:38:45.467645825+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:38:45.467766725+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:38:45.467890623+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:38:45.468815117+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:38:45.470179114+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T11:38:45.470301627+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T11:38:45.473201050+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:38:45.473770455+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:38:45.474316540+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:38:45.481502629+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T11:38:45.481662454+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T11:53:08.539465812+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T11:53:08.734314314+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T11:53:08.778754108+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:53:08.778897398+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:53:08.778998408+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:53:08.779117943+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:53:08.779239864+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:53:08.779338743+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:53:08.780259399+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:53:08.783576283+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:53:08.783715687+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:53:08.783814370+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:53:08.783915534+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:53:08.784001382+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:53:08.784088199+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:53:08.784740931+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:53:08.786145110+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T11:53:08.786253965+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T11:53:08.789165269+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:53:08.790732051+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:53:08.792999819+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:53:08.794538795+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T11:53:08.794658956+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T11:55:32.375294928+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T11:55:32.468897998+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T11:55:32.540546399+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:55:32.540720206+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:55:32.540810322+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:55:32.540929715+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:55:32.541027870+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:55:32.541128773+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:55:32.541713167+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:55:32.543515573+05:00 INFO zbus::handshake - perform;
+2025-04-09T11:55:32.543617853+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T11:55:32.543706337+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:55:32.543877279+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T11:55:32.543956475+05:00 INFO zbus::handshake - read_command;
+2025-04-09T11:55:32.544048232+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T11:55:32.544470395+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T11:55:32.545237353+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T11:55:32.545288733+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T11:55:32.547626153+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:55:32.548981480+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:55:32.549775317+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T11:55:32.550297567+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T11:55:32.551275352+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T11:55:32.552162304+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T11:55:32.552388620+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:00:21.243850067+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:00:21.346640919+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T12:00:21.382458343+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:00:21.382599029+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:00:21.382683428+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:00:21.382780135+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:00:21.382844087+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:00:21.382928295+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:00:21.383479586+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:00:21.385418595+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:00:21.385522750+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:00:21.385615768+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:00:21.385709550+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:00:21.385783334+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:00:21.385867858+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:00:21.386307150+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:00:21.387147398+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:00:21.387231682+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:00:21.389587+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:00:21.390192461+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:00:21.390742731+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:00:21.391752174+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:00:21.391824413+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:00:21.392249047+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:00:21.392350704+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:04:06.343083022+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:04:06.432761513+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T12:04:06.471286968+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:04:06.471439895+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:04:06.471527348+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:04:06.471628040+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:04:06.471698689+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:04:06.471773810+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:04:06.472315014+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:04:06.474197258+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:04:06.474294630+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:04:06.474373112+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:04:06.474457176+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:04:06.474531311+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:04:06.474600312+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:04:06.474999753+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:04:06.475762071+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:04:06.475825274+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:04:06.477759896+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:04:06.478591908+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:04:06.479528001+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:04:06.480636768+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:04:06.480932944+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:04:06.481686489+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:04:06.481791156+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:09:22.006444938+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:09:22.129118882+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T12:09:22.168709215+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:09:22.168867124+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:09:22.168961880+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:09:22.169085884+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:09:22.169182691+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:09:22.169273872+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:09:22.169854797+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:09:22.171876813+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:09:22.172011804+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:09:22.172111942+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:09:22.172225197+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:09:22.172310173+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:09:22.172397206+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:09:22.172978117+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:09:22.173811887+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:09:22.173884238+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:09:22.176667662+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:09:22.177257236+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:09:22.177521480+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:09:22.178251348+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:09:22.178582711+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:09:22.179449319+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:09:22.179657587+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:10:53.349642855+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:10:53.481436322+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T12:10:53.534324515+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:10:53.534455483+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:10:53.534546068+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:10:53.534660764+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:10:53.534741233+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:10:53.534825278+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:10:53.535420077+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:10:53.537329519+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:10:53.537441875+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:10:53.537539296+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:10:53.537629009+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:10:53.537709691+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:10:53.537790756+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:10:53.538251400+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:10:53.539027672+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:10:53.539091846+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:10:53.541728503+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:10:53.542344890+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:10:53.543288332+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:10:53.544615570+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:10:53.544795511+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:10:53.544859385+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:10:53.544989044+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:15:06.572089716+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:15:06.669357417+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1.0833333333333333
+2025-04-09T12:15:06.710321659+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:15:06.710597323+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:15:06.710784432+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:15:06.710994697+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:15:06.711190736+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:15:06.711369188+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:15:06.712053853+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:15:06.714335721+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:15:06.714563783+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:15:06.714750484+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:15:06.714860410+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:15:06.714947205+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:15:06.715031848+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:15:06.715792389+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:15:06.717078950+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:15:06.717186026+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:15:06.720676610+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:15:06.721572486+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:15:06.724345625+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:15:06.726189095+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:15:06.726317235+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:15:06.726563511+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:15:06.726635466+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:49:54.044135160+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:49:54.138192407+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T12:49:54.177750350+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:49:54.178037997+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:49:54.178260396+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:49:54.178467406+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:49:54.178650881+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:49:54.178789014+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:49:54.179827970+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:49:54.183209130+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:49:54.183337274+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:49:54.183432182+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:49:54.183531479+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:49:54.183609284+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:49:54.183692942+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:49:54.184320992+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:49:54.185268522+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:49:54.185343398+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:49:54.188074315+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:49:54.188650029+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:49:54.189239870+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:49:54.191939707+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:49:54.192026769+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T12:49:54.192160558+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:49:54.192256076+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:51:16.910768951+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T12:51:17.043936153+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T12:51:17.107310449+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:51:17.107752252+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:51:17.107843066+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:51:17.108252798+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:51:17.108458059+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:51:17.108642660+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:51:17.110875732+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:51:17.113607678+05:00 INFO zbus::handshake - perform;
+2025-04-09T12:51:17.113730822+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T12:51:17.113837603+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:51:17.113939189+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T12:51:17.114015477+05:00 INFO zbus::handshake - read_command;
+2025-04-09T12:51:17.114094224+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T12:51:17.114790765+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T12:51:17.116058639+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T12:51:17.116157784+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T12:51:17.119463740+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:51:17.120032243+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:51:17.120824120+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T12:51:17.122139988+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T12:51:17.122489413+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T12:51:17.123011018+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T12:51:17.123097103+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T13:01:53.371853583+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T13:01:53.467705299+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T13:01:53.510225402+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:01:53.510389016+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:01:53.510492764+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:01:53.510608653+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:01:53.510688545+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:01:53.510771808+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:01:53.511570732+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:01:53.514569482+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:01:53.514696569+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:01:53.514815303+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:01:53.514950254+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:01:53.515053884+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:01:53.515160040+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:01:53.515962700+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:01:53.517126454+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T13:01:53.517238678+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T13:01:53.521004811+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:01:53.522155606+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:01:53.522889835+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T13:01:53.523053029+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T13:01:53.523168894+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T13:01:53.523246350+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T13:01:53.523735686+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:05:57.606166312+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T13:05:57.702705894+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T13:05:57.746000867+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:05:57.746155023+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:05:57.746281961+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:05:57.746395636+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:05:57.746469428+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:05:57.746552008+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:05:57.747111544+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:05:57.749475422+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:05:57.749748275+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:05:57.749895533+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:05:57.750040923+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:05:57.750153687+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:05:57.750266703+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:05:57.750818469+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:05:57.751680143+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T13:05:57.751755970+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T13:05:57.753942415+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:05:57.754520562+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:05:57.755340350+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.15"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:28:01.076596220+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T13:28:01.177191118+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T13:28:01.216069019+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:28:01.216258575+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:28:01.216357684+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:28:01.216483615+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:28:01.216565555+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:28:01.216647037+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:28:01.217277934+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:28:01.219265410+05:00 INFO zbus::handshake - perform;
+2025-04-09T13:28:01.219357134+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T13:28:01.219446865+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:28:01.219540142+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T13:28:01.219614355+05:00 INFO zbus::handshake - read_command;
+2025-04-09T13:28:01.219695247+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T13:28:01.220199460+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T13:28:01.221367483+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T13:28:01.221449869+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T13:28:01.224521834+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:28:01.225636662+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T13:28:01.227429090+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T13:28:01.227607459+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T13:28:01.227699118+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T13:28:01.227736586+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T13:28:01.227912517+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T15:28:47.808830270+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T15:28:48.013600563+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T15:28:48.077718360+05:00 INFO zbus::handshake - perform;
+2025-04-09T15:28:48.077934176+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T15:28:48.078106929+05:00 INFO zbus::handshake - read_command;
+2025-04-09T15:28:48.078274275+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T15:28:48.078430628+05:00 INFO zbus::handshake - read_command;
+2025-04-09T15:28:48.078575536+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T15:28:48.079342286+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T15:28:48.082263736+05:00 INFO zbus::handshake - perform;
+2025-04-09T15:28:48.082766857+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T15:28:48.082930850+05:00 INFO zbus::handshake - read_command;
+2025-04-09T15:28:48.083074192+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T15:28:48.083219615+05:00 INFO zbus::handshake - read_command;
+2025-04-09T15:28:48.083344703+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T15:28:48.084247350+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T15:28:48.086070584+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T15:28:48.086207995+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T15:28:48.090547327+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T15:28:48.091511607+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T15:28:48.093985118+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T15:28:48.094967916+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T15:28:48.095174447+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T15:28:48.095279708+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T15:28:48.095450652+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T16:40:56.731555079+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T16:40:56.964020742+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T16:40:57.017893108+05:00 INFO zbus::handshake - perform;
+2025-04-09T16:40:57.018073129+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T16:40:57.018214714+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:40:57.018340740+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T16:40:57.018429770+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:40:57.018519119+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T16:40:57.019085220+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T16:40:57.021178752+05:00 INFO zbus::handshake - perform;
+2025-04-09T16:40:57.021281751+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T16:40:57.021374393+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:40:57.021473885+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T16:40:57.021551792+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:40:57.021638948+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T16:40:57.022083679+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T16:40:57.023028328+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T16:40:57.023115767+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T16:40:57.025641656+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:40:57.026769388+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:40:57.027570552+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:40:57.028665500+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T16:40:57.029347606+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T16:40:57.029418663+05:00 INFO warp::server - listening on http://0.0.0.0:65535
+2025-04-09T16:40:57.029487448+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T16:42:59.161651462+05:00 INFO shadowproxy_gui - Application Starting
+2025-04-09T16:42:59.262391316+05:00 INFO winit::platform_impl::platform::x11::window - Guessed window scale factor: 1
+2025-04-09T16:42:59.304220994+05:00 INFO zbus::handshake - perform;
+2025-04-09T16:42:59.304389791+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T16:42:59.304524991+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:42:59.304630542+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T16:42:59.304704069+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:42:59.304784165+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T16:42:59.305343732+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T16:42:59.307406404+05:00 INFO zbus::handshake - perform;
+2025-04-09T16:42:59.307556651+05:00 INFO zbus::handshake - write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+2025-04-09T16:42:59.307647571+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:42:59.307773989+05:00 INFO zbus::handshake - write_command; command=NegotiateUnixFD
+2025-04-09T16:42:59.307850898+05:00 INFO zbus::handshake - read_command;
+2025-04-09T16:42:59.307936385+05:00 INFO zbus::handshake - write_command; command=Begin
+2025-04-09T16:42:59.308510991+05:00 INFO zbus::socket_reader - socket reader;
+2025-04-09T16:42:59.309399682+05:00 INFO zbus::connection - start_object_server; started_event=None
+2025-04-09T16:42:59.309481484+05:00 INFO zbus::connection - {}; obj_server_task_name="ObjectServer task"
+2025-04-09T16:42:59.312307417+05:00 INFO zbus::object_server - dispatch_message; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:42:59.312899203+05:00 INFO zbus::object_server - dispatch_method_call; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:42:59.313402649+05:00 INFO zbus::object_server - dispatch_method_call_try; msg=Msg { type: MethodCall, sender: UniqueName(Str(Borrowed(":1.1"))), path: ObjectPath("/org/a11y/atspi/accessible/root"), iface: InterfaceName(Str(Borrowed("org.freedesktop.DBus.Properties"))), member: MemberName(Str(Borrowed("Set"))), body: Signature("ssv") }
+2025-04-09T16:42:59.314714656+05:00 INFO warp::server - Server::run; addr=0.0.0.0:5000
+2025-04-09T16:42:59.315019561+05:00 INFO warp::server - listening on http://0.0.0.0:5000
+2025-04-09T16:42:59.315755078+05:00 INFO warp::server - Server::run; addr=0.0.0.0:65535
+2025-04-09T16:42:59.315830485+05:00 INFO warp::server - listening on http://0.0.0.0:65535

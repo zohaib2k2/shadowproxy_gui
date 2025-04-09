@@ -1,7 +1,7 @@
 /*
  * Copyright (C) [2025] [Zohaib Zafar]
  *
- * 
+ *
  * This program is free software:
  * not just free as in free beer but also 'free' as in freedom.
  * you can redistribute it and/or modify
@@ -20,29 +20,27 @@
 
 use eframe::egui::{self, ScrollArea, Vec2};
 
-
-use reqwest::Client;
-use tokio::runtime::Runtime;
+use genpdf::*;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use utils::structs::{IntoHeaderMap, IntoMethod, RequestDataProper};
+use reqwest::Client;
+use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use serde_json::{Value, from_str};
 use std::sync::{Arc, Mutex};
-use std::{thread, vec};
-use url;
 use std::time::Duration;
-
+use std::{thread, vec};
+use tokio::runtime::Runtime;
+use url;
+use utils::structs::{IntoHeaderMap, IntoMethod, RequestDataProper};
 mod servers;
 mod utils;
 
-use crate::utils::structs::RequestData;
 use crate::utils::converters::decompress_response;
+use crate::utils::structs::RequestData;
 
-use log::{info, warn, error};
+use log::{error, info, warn};
 use log4rs;
 
 /// A basic logger for all the activities.
-
 
 /// The `MyApp` struct represents the core application state for an `egui`-based proxy tool.
 /// It manages tabs, request storage, request selection, response handling, and proxy/recon state.
@@ -52,8 +50,12 @@ struct MyApp {
     active_tab: Tab,
 
     /// Search url
-    search_url : String,
+    search_url: String,
 
+    /// show generate pdf popup
+    show_pop_up : bool,
+
+    save_pdf_filename: String,
     /// A shared, thread-safe collection for storing intercepted HTTP requests.
     /// Used to temporarily collect requests before they are processed.
     dock_collector: Arc<Mutex<Vec<String>>>,
@@ -65,26 +67,25 @@ struct MyApp {
     /// The request currently selected for display in the UI.
     selected_for_show: RequestData,
 
-     /// A shared, thread-safe string that holds the HTTP response body.
+    /// A shared, thread-safe string that holds the HTTP response body.
     /// This allows multiple parts of the UI to access or modify the response.
     response_text: Arc<Mutex<String>>,
 
     repeater_request: Arc<Mutex<Vec<RequestData>>>,
 
     selected_repeater_request: RequestData,
-    selected_repeater_request_text : String,
+    selected_repeater_request_text: String,
 
     repeater_response: Arc<Mutex<String>>,
-     /// A flag to indicate whether the proxy should stop running.
+    /// A flag to indicate whether the proxy should stop running.
     /// `true` means the proxy should stop; `false` means it's active.
     stop_proxy: bool,
 
     /// A flag to indicate whether the reconnaissance process should stop.
     /// `true` means recon should stop; `false` means it's active.
     stop_recon: bool,
-    
-    show_proxy_context_menu: bool,
 
+    show_proxy_context_menu: bool,
 }
 
 #[derive(PartialEq)]
@@ -96,32 +97,27 @@ enum Tab {
 
 impl Default for MyApp {
     /// Provides a default implementation for `MyApp`.
-    /// 
+    ///
     /// This initializes shared request storage, spawns a background thread
     /// to capture web requests, and sets default values for various UI elements.
     fn default() -> Self {
-        
         let request_store = Arc::new(Mutex::new(vec![]));
         let request_store_clone = Arc::clone(&request_store);
-        
+
         let google_dork_collector = Arc::new(Mutex::new(vec![]));
-        let google_dork_collector_clone = Arc::clone(&google_dork_collector); 
+        let google_dork_collector_clone = Arc::clone(&google_dork_collector);
 
         let repeater_request = Arc::new(Mutex::new(vec![]));
         let repeater_request_clone = Arc::clone(&repeater_request);
 
         // Start background thread for capturing web requests
-        thread::spawn(
-            move || { 
-                servers::json_thread_listner::start_warp_server(request_store_clone);
-            }
-        );
+        thread::spawn(move || {
+            servers::json_thread_listner::start_warp_server(request_store_clone);
+        });
 
-        // thread::spawn(
-        //     move || {
-        //         servers::dorklistiner::start_link_server(google_dork_collector_clone);
-        //     }
-        // );
+        thread::spawn(move || {
+            servers::dorklistiner::start_link_server(google_dork_collector_clone);
+        });
         /*
         thread::spawn(move || {
             let mut count = 0;
@@ -136,6 +132,8 @@ impl Default for MyApp {
 
         Self {
             active_tab: Tab::Recon,
+            save_pdf_filename: "output.pdf".to_owned(),
+            show_pop_up: false,
             dock_collector: google_dork_collector,
             request_store: request_store,
             selected_for_show: RequestData::empty(),
@@ -146,10 +144,9 @@ impl Default for MyApp {
             stop_proxy: false,
             stop_recon: false,
             show_proxy_context_menu: false,
-            selected_repeater_request_text : String::from(""),
-            search_url : String::from("")
+            selected_repeater_request_text: String::from(""),
+            search_url: String::from(""),
         }
-
     }
 }
 
@@ -169,7 +166,6 @@ impl eframe::App for MyApp {
     /// **Repaint Request**: The UI is set to periodically repaint every 600 milliseconds
     /// to ensure the UI stays up to date.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
                 if ui.button("Reconnisense").clicked() {
@@ -179,7 +175,7 @@ impl eframe::App for MyApp {
                     self.active_tab = Tab::Proxy;
                 }
 
-                if ui.button("Repeater").clicked(){
+                if ui.button("Repeater").clicked() {
                     self.active_tab = Tab::Repeater;
                 }
             });
@@ -195,20 +191,48 @@ impl eframe::App for MyApp {
 
         // Request repaint to update the UI periodically
         ctx.request_repaint_after(Duration::from_millis(600));
+        if self.show_pop_up {
+            egui::Window::new("Save as PDF")
+                .collapsible(false)
+                .resizable(false)
+                .show(ctx, |ui| {
+                    ui.label("Enter file name (e.g., report.pdf):");
+                    ui.text_edit_singleline(&mut self.save_pdf_filename);
+
+                    ui.horizontal(|ui| {
+                        if ui.button("Save").clicked() {
+                            
+                            self.genrate_pdf(
+                                self.selected_repeater_request_text.clone(),
+                                self.repeater_response.lock().unwrap().to_string(),
+                                self.save_pdf_filename.clone(),
+                            );
+                            self.show_pop_up = false;
+                        }
+
+                        if ui.button("Cancel").clicked() {
+                            self.show_pop_up = false;
+                        }
+                    });
+                });
+        }
     }
 }
 
 impl MyApp {
-    
     //TODO: Implement recon like google dorking
     /// Displays the Google Dork capture tab.
     ///
     /// This function is responsible for rendering the UI elements related to
     /// capturing Google Dork search results.
-    fn capture_google_dork_tab(&self, ui: &mut egui::Ui){
+    fn capture_google_dork_tab(&self, ui: &mut egui::Ui) {
+        let mut dork_link_searcher = "".to_string();
 
+        ui.label("Google Dorks");
+        let aval_height = ui.available_height();
+
+        ui.add(egui::TextEdit::singleline(&mut dork_link_searcher));
     }
-
 
     /// Displays the Proxy tab, which captures and displays HTTP requests.
     ///
@@ -219,96 +243,94 @@ impl MyApp {
     /// - Displays request and response data in two separate scrollable text panels.
     fn proxy_tab(&mut self, ui: &mut egui::Ui) {
         ui.label("Captured Requests:");
-        ui.horizontal( |ui| {
-            if ui.button("Stop").clicked(){
+        ui.horizontal(|ui| {
+            if ui.button("Stop").clicked() {
                 self.stop_proxy = true;
             }
-            if ui.button("Start").clicked(){
+            if ui.button("Start").clicked() {
                 self.stop_proxy = false;
             }
-
-        }) ;   
+        });
         let max_height = ui.available_height() * (0.75);
         // Make the table scroll-able both horizontally and vertically, you motherfucker.
         ui.add(
-        egui::TextEdit::singleline(&mut self.search_url)
-            .hint_text("Type to search url...")
-            .desired_width(200.0)
+            egui::TextEdit::singleline(&mut self.search_url)
+                .hint_text("Type to search url...")
+                .desired_width(200.0),
         );
         ScrollArea::both()
             .id_source("Proxy_table_scroll")
             .max_height(max_height)
             .auto_shrink([false; 2])
             .show(ui, |ui| {
-            egui::Grid::new("Proxy table")
-                .striped(true)
-                .min_col_width(20.0)
-                .show ( ui, |ui|{
-                    // "Its not death, but dying which is terriable"
-                    // -- Henry Fielding (1707)
-                        
-                    // Table headers
-                    ui.label("Index");
-                    ui.label("Method");
-                    ui.label("URL");
-                    ui.label("Headers");
-                    ui.end_row();
-                
-    
-                    let log = self.request_store.lock().unwrap();
+                egui::Grid::new("Proxy table")
+                    .striped(true)
+                    .min_col_width(20.0)
+                    .show(ui, |ui| {
+                        // "Its not death, but dying which is terriable"
+                        // -- Henry Fielding (1707)
 
-                    for (index,entry) in log.iter().enumerate() {
-                        if self.stop_proxy {
-                            continue;
-                        }
-                        if entry.url.clone().contains(&self.search_url) {
-                            if ui.button(format!("{}",index + 1)).clicked(){
-                                self.selected_for_show = RequestData{
-                                        request_type:entry.request_type.clone(),
-                                        http_version:entry.http_version.clone(),
-                                        method:entry.method.clone(),
-                                        url:entry.url.clone(),
-                                        headers:entry.headers.clone(),
-                                        body:entry.body.clone()};
-                                
-                                //println!("{}",self.selected_for_show.headers);
-                                let e1 = &self.selected_for_show.headers.replace("\"","\\\"").replace("'","\"");
-                                let headers1: HashMap<String,String> = serde_json::from_str(e1).unwrap();
-                                for (key, value) in headers1 {
-                                    println!("{}: {}", key, value);
-                                }
+                        // Table headers
+                        ui.label("Index");
+                        ui.label("Method");
+                        ui.label("URL");
+                        ui.label("Headers");
+                        ui.end_row();
 
+                        let log = self.request_store.lock().unwrap();
+
+                        for (index, entry) in log.iter().enumerate() {
+                            if self.stop_proxy {
+                                continue;
                             }
-                            ui.label(&entry.method);
-                            ui.label(&entry.url);
-                            // Display headers as a JSON string
-                            // let headers_str = format!("{:?}", entry.headers);
-                            ui.end_row();
+                            if entry.url.clone().contains(&self.search_url) {
+                                if ui.button(format!("{}", index + 1)).clicked() {
+                                    self.selected_for_show = RequestData {
+                                        request_type: entry.request_type.clone(),
+                                        http_version: entry.http_version.clone(),
+                                        method: entry.method.clone(),
+                                        url: entry.url.clone(),
+                                        headers: entry.headers.clone(),
+                                        body: entry.body.clone(),
+                                    };
+
+                                    //println!("{}",self.selected_for_show.headers);
+                                    let e1 = &self
+                                        .selected_for_show
+                                        .headers
+                                        .replace("\"", "\\\"")
+                                        .replace("'", "\"");
+                                    let headers1: HashMap<String, String> =
+                                        serde_json::from_str(e1).unwrap();
+                                    for (key, value) in headers1 {
+                                        println!("{}: {}", key, value);
+                                    }
+                                }
+                                ui.label(&entry.method);
+                                ui.label(&entry.url);
+                                // Display headers as a JSON string
+                                // let headers_str = format!("{:?}", entry.headers);
+                                ui.end_row();
+                            }
                         }
-                    }
-                }
-                );
-        });
+                    });
+            });
 
         ui.separator();
-        ui.horizontal( |ui| {
-            if ui.button("Send Request").clicked(){
+        ui.horizontal(|ui| {
+            if ui.button("Send Request").clicked() {
                 let selected_req_for_show = self.selected_for_show.clone();
-              
-                self.send_request(ui.ctx().clone(),selected_req_for_show,Tab::Proxy);
+
+                self.send_request(ui.ctx().clone(), selected_req_for_show, Tab::Proxy);
             }
-            if ui.button("Send to repeater").clicked(){
-                self.update_selected_text(); 
+            if ui.button("Send to repeater").clicked() {
+                self.update_selected_text();
                 self.selected_repeater_request = self.selected_for_show.clone();
-
             }
-
         });
         ui.horizontal(|ui| {
-            
-            //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));  
-            let bottom_window_size = [500.0,185.0];
-            
+            //ui.text_edit_multiline(&mut format!("{:?}",self.selected_for_show));
+            let bottom_window_size = [500.0, 185.0];
 
             egui::ScrollArea::both()
                 .id_source("proxy_show_window_scroll")
@@ -316,51 +338,57 @@ impl MyApp {
                 .min_scrolled_width(bottom_window_size[0])
                 .max_width(bottom_window_size[0])
                 .min_scrolled_height(bottom_window_size[1])
-                .show(ui, |ui| { 
-                       let ui_resp = ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{:?}",self.selected_for_show)));
-                       if ui_resp.clicked_by(egui::PointerButton::Secondary) {
-                           self.show_proxy_context_menu = true;
-                       }
-
-                       if self.show_proxy_context_menu {
-                           egui::menu::bar(ui, |ui| {
-                                ui.menu_button("Context Menu", |ui|{
-                                    if ui.button("Copy").clicked(){
-                                        ui.output_mut(|o| o.copied_text = "Hello world!".to_string())
-                                    }
-                                })
-                           }
-                           );
-                       }
+                .show(ui, |ui| {
+                    let ui_resp = ui.add_sized(
+                        bottom_window_size,
+                        egui::TextEdit::multiline(&mut format!("{:?}", self.selected_for_show)),
+                    );
+                    if ui_resp.clicked_by(egui::PointerButton::Secondary) {
+                        self.show_proxy_context_menu = true;
                     }
-                );
-            
+
+                    if self.show_proxy_context_menu {
+                        egui::menu::bar(ui, |ui| {
+                            ui.menu_button("Context Menu", |ui| {
+                                if ui.button("Copy").clicked() {
+                                    ui.output_mut(|o| o.copied_text = "Hello world!".to_string())
+                                }
+                            })
+                        });
+                    }
+                });
+
             egui::ScrollArea::both()
                 .id_source("response")
                 .max_height(bottom_window_size[1])
                 .max_width(bottom_window_size[0])
-                .show(ui, |ui| { 
-                        let ui_resp = ui.add_sized(bottom_window_size, egui::TextEdit::multiline(&mut format!("{}",self.response_text.lock().unwrap())));
-
-                    }
-                );
+                .show(ui, |ui| {
+                    let ui_resp = ui.add_sized(
+                        bottom_window_size,
+                        egui::TextEdit::multiline(&mut format!(
+                            "{}",
+                            self.response_text.lock().unwrap()
+                        )),
+                    );
+                });
         });
-
-    
     }
-     /// Displays the Repeater tab, which allows modifying and resending requests.
+    /// Displays the Repeater tab, which allows modifying and resending requests.
     ///
     /// This function is responsible for rendering the UI elements of the
     /// request repeater feature.
-    fn repeater_tab(&mut self, ui: &mut eframe::egui::Ui){
+    fn repeater_tab(&mut self, ui: &mut eframe::egui::Ui) {
         ui.separator();
-    
+
         let available_height = ui.available_height();
         let available_width = ui.available_width();
-        ui.horizontal( |ui| {
-            if ui.button("Send").clicked(){
-
-                self.send_request(ui.ctx().clone(),self.selected_repeater_request.clone(),Tab::Repeater);
+        ui.horizontal(|ui| {
+            if ui.button("Send").clicked() {
+                self.send_request(
+                    ui.ctx().clone(),
+                    self.selected_repeater_request.clone(),
+                    Tab::Repeater,
+                );
                 let _n = self.selected_repeater_request_text.clone();
 
                 //println!("\n\n\nString: {}",_n);
@@ -370,63 +398,63 @@ impl MyApp {
                 match pased_request {
                     Ok(parsed) => {
                         self.selected_repeater_request = parsed;
-                    },
+                    }
                     Err(err_str) => {
                         *self.repeater_response.lock().unwrap() = err_str;
                     }
                 }
             }
-            if ui.button("Print Req").clicked(){
-                println!("{}",self.selected_repeater_request_text);
+            if ui.button("Print Req").clicked() {
+                println!("{}", self.selected_repeater_request_text);
             }
             if ui.button("Print resp").clicked() {
-                println!("{}",self.repeater_response.lock().unwrap())
+                println!("{}", self.repeater_response.lock().unwrap())
+            }
+            if ui.button("Genrate PDF").clicked() {
+                self.show_pop_up = true;
             }
         });
 
-        ui.horizontal( |ui| {
+        ui.horizontal(|ui| {
             egui::ScrollArea::both()
                 .id_source("request_rep")
                 .max_height(available_height * 0.95)
-                .max_width(available_width/2.0)
+                .max_width(available_width / 2.0)
                 .min_scrolled_height(available_height)
                 .show(ui, |ui| {
-                    ui.add_sized([available_width/2.0, available_height*0.95],
+                    ui.add_sized(
+                        [available_width / 2.0, available_height * 0.95],
                         egui::TextEdit::multiline(&mut self.selected_repeater_request_text)
-                            .desired_width(f32::INFINITY)
-                        );
-                    });
+                            .desired_width(f32::INFINITY),
+                    );
+                });
             egui::ScrollArea::both()
                 .id_source("respone_rep")
                 .max_height(available_height * 0.95)
-                .max_width(available_width/2.0)
+                .max_width(available_width / 2.0)
                 .min_scrolled_height(available_height)
                 .show(ui, |ui| {
-                    // Yar ab ma kud-kooshi kar lon ga muj se 
+                    // Yar ab ma kud-kooshi kar lon ga muj se
                     // nai banta gui.
-                    ui.add_sized([available_width/2.0, available_height*0.95],
-
-                        egui::TextEdit::multiline(&mut self.repeater_response.lock().unwrap().to_string())
-                            .desired_width(f32::INFINITY));
-                    
-                    });
-                
-
+                    ui.add_sized(
+                        [available_width / 2.0, available_height * 0.95],
+                        egui::TextEdit::multiline(
+                            &mut self.repeater_response.lock().unwrap().to_string(),
+                        )
+                        .desired_width(f32::INFINITY),
+                    );
+                });
         });
-            
-
-
-
     }
-    
-    fn update_selected_text(&mut self){
-        println!("\n\n\nupdate: {:?}",self.selected_repeater_request);
-        println!("\n\n\nupdate .to_string: {:?}",self.selected_repeater_request.to_string());
+
+    fn update_selected_text(&mut self) {
+        println!("\n\n\nupdate: {:?}", self.selected_repeater_request);
+        println!(
+            "\n\n\nupdate .to_string: {:?}",
+            self.selected_repeater_request.to_string()
+        );
         self.selected_repeater_request_text = self.selected_repeater_request.to_string();
-
     }
-
-
 
     /// Sends the currently selected request asynchronously.
     ///
@@ -436,20 +464,17 @@ impl MyApp {
     /// - Updates `response_text` with the server's response or an error message.
     /// - Runs the request in a separate thread to avoid blocking the UI.
 
-	fn send_request(&self, ctx: egui::Context, selected_req: RequestData,tab: Tab) {
+    fn send_request(&self, ctx: egui::Context, selected_req: RequestData, tab: Tab) {
         let selected_request = selected_req;
 
         let response_text = match tab {
-            Tab::Proxy =>  Arc::clone(&self.response_text),
+            Tab::Proxy => Arc::clone(&self.response_text),
             Tab::Repeater => Arc::clone(&self.repeater_response),
             _ => {
                 info!("Wrong tab!");
                 panic!();
             }
         };
-            
-        
-
         std::thread::spawn(move || {
             let runtime = Runtime::new().unwrap();
             runtime.block_on(async {
@@ -556,7 +581,52 @@ impl MyApp {
             });
         });
     }
+
+    /// generates a pdf that takes the left panel string of repeater
+    /// and right panel string of repeater.
+    fn genrate_pdf(&self,left_panel_text: String, right_panel_text: String, filename: String) {
+        let font_family =
+            genpdf::fonts::from_files("/usr/share/fonts/liberation", "LiberationSans", None)
+                .expect("Failed to load font family");
+        // Create a document and set the default font family
+        let mut doc = genpdf::Document::new(font_family);
+
+        // Change the default settings
+        doc.set_title("Demo document");
+        // Customize the pages
+        let mut decorator = genpdf::SimplePageDecorator::new();
+        decorator.set_margins(10);
+        doc.set_page_decorator(decorator);
+        // Add one or more elements
+        doc.push(
+            genpdf::elements::Paragraph::new("Repeater/Response Document")
+                .aligned(genpdf::Alignment::Center)
+                .styled(genpdf::style::Style::new().bold().with_font_size(20)),
+        );
+        doc.push(
+            elements::Paragraph::new("Request:")
+                .aligned(Alignment::Left)
+                .styled(style::Style::new().bold().with_font_size(15)),
+        );
+        for line in left_panel_text.split("\n") {
+            doc.push(genpdf::elements::Paragraph::new(line));
+        }
+
+        doc.push(
+            elements::Paragraph::new("Response")
+                .aligned(Alignment::Left)
+                .styled(style::Style::new().bold().with_font_size(15)),
+        );
+
+        for line in right_panel_text.split("\n") {
+            doc.push(genpdf::elements::Paragraph::new(line));
+        }
+        // Render the document and write it to a file
+        doc.render_to_file(filename)
+            .expect("Failed to write PDF file");
 }
+}
+
 
 fn main() {
     log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
@@ -566,15 +636,9 @@ fn main() {
         initial_window_size: Some(Vec2::new(500.0, 400.0)),
         ..Default::default()
     };
-    let _ = eframe::run_native("Egui Background Task Example", options, Box::new(|_cc| Box::new(MyApp::default())));
-    let i = 32;
-	
-
-    let v = String::new();
-	
-
-
-
-
+    let _ = eframe::run_native(
+        "Egui Background Task Example",
+        options,
+        Box::new(|_cc| Box::new(MyApp::default())),
+    );
 }
-

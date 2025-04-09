@@ -1,13 +1,11 @@
 use std::collections::HashMap;
 
-use flate2::read::{GzDecoder, DeflateDecoder};
 use brotli::Decompressor;
-use std::io::Read;
-use reqwest::header::{HeaderMap,HeaderName,HeaderValue};
+use flate2::read::{DeflateDecoder, GzDecoder};
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde_json;
 use serde_json::Value;
-
-
+use std::io::Read;
 
 /// Decompress a response body based on the `Content-Encoding` header.
 pub fn decompress_response(body: &[u8], encoding: Option<&str>) -> Result<Vec<u8>, &'static str> {
@@ -41,8 +39,10 @@ pub fn decompress_response(body: &[u8], encoding: Option<&str>) -> Result<Vec<u8
 
 /// json_headers:str to HashMap
 /// convert json_headers in &str form into Hashmap.
-pub fn json_str_to_hashmap(json_headers: &str) -> Result<HashMap<String,String>,Box<dyn std::error::Error>> {
-    let corrected_string = json_headers.replace("\"","\\\"").replace("'","\"");
+pub fn json_str_to_hashmap(
+    json_headers: &str,
+) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
+    let corrected_string = json_headers.replace("\"", "\\\"").replace("'", "\"");
 
     let header_value: Value = serde_json::from_str(&corrected_string)?;
 
@@ -50,22 +50,22 @@ pub fn json_str_to_hashmap(json_headers: &str) -> Result<HashMap<String,String>,
         .as_object()
         .ok_or("Invalid JSON object")?
         .iter()
-        .map( |(k,v)|{
-            let value = v.as_str().ok_or("Header value is not a string")?.to_string();
-            Ok((k.to_string(),value))
+        .map(|(k, v)| {
+            let value = v
+                .as_str()
+                .ok_or("Header value is not a string")?
+                .to_string();
+            Ok((k.to_string(), value))
         })
         .collect::<Result<_, Box<dyn std::error::Error>>>()?;
 
-        Ok(header_map)
+    Ok(header_map)
 }
-
 
 /// Translates the intercepted headers in string,
 /// into header. `reqwest`
 pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::error::Error>> {
-    
-    let corrected_string = json_headers.replace("\"","\\\"").replace("'","\"");
-
+    let corrected_string = json_headers.replace("\"", "\\\"").replace("'", "\"");
 
     // Parse the JSON string into a serde_json::Value
     let headers_value: Value = serde_json::from_str(&corrected_string)?;
@@ -76,7 +76,10 @@ pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::
         .ok_or("Invalid JSON object")?
         .iter()
         .map(|(k, v)| {
-            let value = v.as_str().ok_or("Header value is not a string")?.to_string();
+            let value = v
+                .as_str()
+                .ok_or("Header value is not a string")?
+                .to_string();
             Ok((k.to_string(), value))
         })
         .collect::<Result<_, Box<dyn std::error::Error>>>()?;
@@ -84,7 +87,9 @@ pub fn json_to_header_map(json_headers: &str) -> Result<HeaderMap, Box<dyn std::
     // Convert the HashMap into a reqwest::header::HeaderMap
     let mut header_map = HeaderMap::new();
     for (key, value) in headers_map {
-        if key.trim().to_lowercase() == "if-modified-since" || key.trim().to_lowercase() == "if-none-match"{
+        if key.trim().to_lowercase() == "if-modified-since"
+            || key.trim().to_lowercase() == "if-none-match"
+        {
             continue;
         }
         let header_name = HeaderName::from_bytes(&key.as_bytes())?;
