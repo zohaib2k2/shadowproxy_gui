@@ -3,7 +3,7 @@
  *
  *
  * This program is free software:
- * not just free as in free beer but also 'free' as in freedom.
+ * not just free as in free ice-cream but also 'free' as in freedom.
  * you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +31,13 @@ use std::{thread, vec};
 use tokio::runtime::Runtime;
 use url;
 use utils::structs::{IntoHeaderMap, IntoMethod, RequestDataProper};
+use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
+use html_escape;
+
 mod servers;
 mod utils;
+
+
 
 use crate::utils::converters::decompress_response;
 use crate::utils::structs::RequestData;
@@ -59,6 +64,8 @@ struct MyApp {
     /// A shared, thread-safe collection for storing intercepted HTTP requests.
     /// Used to temporarily collect requests before they are processed.
     dock_collector: Arc<Mutex<Vec<String>>>,
+
+    dork_link_searcher : String,
 
     /// A shared, thread-safe storage for all captured HTTP requests.
     /// This stores the main history of intercepted requests.
@@ -90,9 +97,13 @@ struct MyApp {
 
 #[derive(PartialEq)]
 enum Tab {
+    Intro,
     Recon,
     Proxy,
     Repeater,
+    encoder,
+    decoder,
+    //bruteforcer
 }
 
 impl Default for MyApp {
@@ -131,7 +142,7 @@ impl Default for MyApp {
         */
 
         Self {
-            active_tab: Tab::Recon,
+            active_tab: Tab::Intro,
             save_pdf_filename: "output.pdf".to_owned(),
             show_pop_up: false,
             dock_collector: google_dork_collector,
@@ -145,6 +156,7 @@ impl Default for MyApp {
             stop_recon: false,
             show_proxy_context_menu: false,
             selected_repeater_request_text: String::from(""),
+            dork_link_searcher: String::from(""),
             search_url: String::from(""),
         }
     }
@@ -168,6 +180,9 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
+                if ui.button("Intro").clicked() {
+                    self.active_tab = Tab::Intro;
+                }
                 if ui.button("Reconnisense").clicked() {
                     self.active_tab = Tab::Recon;
                 }
@@ -178,14 +193,24 @@ impl eframe::App for MyApp {
                 if ui.button("Repeater").clicked() {
                     self.active_tab = Tab::Repeater;
                 }
+
+                if ui.button("Encoder").clicked() {
+                    self.active_tab = Tab::encoder;
+                }
+                if ui.button("Decoder").clicked() {
+                    self.active_tab = Tab::decoder;
+                }
             });
 
             ui.separator();
 
             match self.active_tab {
+                Tab::Intro => self.intro_tab(ui),
                 Tab::Recon => self.capture_google_dork_tab(ui),
                 Tab::Proxy => self.proxy_tab(ui),
                 Tab::Repeater => self.repeater_tab(ui),
+                Tab::encoder => self.encoder_tab(ui),
+                Tab::decoder => self.decoder_tab(ui),
             }
         });
 
@@ -220,18 +245,214 @@ impl eframe::App for MyApp {
 }
 
 impl MyApp {
+
+    fn intro_tab(&mut self, ui: &mut egui::Ui) {
+    // Wrap content in a ScrollArea to make it scrollable
+    egui::ScrollArea::vertical()
+        .auto_shrink([false, false])
+        .show(ui, |ui| {
+            // Center the content vertically and horizontally
+            ui.vertical_centered(|ui| {
+                // Add some spacing at the top
+                ui.add_space(20.0);
+
+                // Title with a bold, large font
+                ui.heading(
+                    egui::RichText::new("Welcome to Shadow Proxy")
+                        .strong()
+                        .size(28.0)
+                        .color(egui::Color32::from_rgb(255, 255, 255)),
+                );
+
+                // Subtitle or tagline
+                ui.label(
+                    egui::RichText::new("A powerful, intuitive tool for network analysis and testing")
+                        .italics()
+                        .size(16.0)
+                        .color(egui::Color32::from_rgb(200, 200, 200)),
+                );
+
+                // Add spacing before the feature grid
+                ui.add_space(30.0);
+
+                // Use a grid layout to display features with equal column widths
+                egui::Grid::new("intro_features_grid")
+                    .num_columns(2)
+                    .spacing([40.0, 20.0])
+                    .min_col_width(ui.available_width() / 2.0 - 20.0) // Ensure equal column widths
+                    .show(ui, |ui| {
+                        // Feature 1: Recon
+                        ui.vertical(|ui| {
+                            // Set a maximum width for the vertical component
+                            ui.set_max_width(ui.available_width());
+                            ui.heading(
+                                egui::RichText::new("Recon")
+                                    .strong()
+                                    .size(18.0)
+                                    .color(egui::Color32::from_rgb(100, 200, 255)),
+                            );
+                            ui.label(
+                                egui::RichText::new(
+                                    "Discover and enumerate network targets with advanced reconnaissance tools. Scan for open ports, services, and vulnerabilities effortlessly."
+                                )
+                                .size(14.0),
+                            );
+                        });
+
+                        // Feature 2: Proxy
+                        ui.vertical(|ui| {
+                            // Set a maximum width for the vertical component
+                            ui.set_max_width(ui.available_width());
+                            ui.heading(
+                                egui::RichText::new("Proxy")
+                                    .strong()
+                                    .size(18.0)
+                                    .color(egui::Color32::from_rgb(100, 200, 255)),
+                            );
+                            ui.label(
+                                egui::RichText::new(
+                                    "Intercept and analyze HTTP/HTTPS traffic in real-time. Modify requests and responses to test application behavior."
+                                )
+                                .size(14.0),
+                            );
+                        });
+                        ui.end_row();
+
+                        // Feature 3: Repeater
+                        ui.vertical(|ui| {
+                            // Set a maximum width for the vertical component
+                            ui.set_max_width(ui.available_width());
+                            ui.heading(
+                                egui::RichText::new("Repeater")
+                                    .strong()
+                                    .size(18.0)
+                                    .color(egui::Color32::from_rgb(100, 200, 255)),
+                            );
+                            ui.label(
+                                egui::RichText::new(
+                                    "Replay and tweak requests to test server responses. Perfect for debugging and exploring edge cases."
+                                )
+                                .size(14.0),
+                            );
+                        });
+
+                        // Feature 4: Encoder
+                        ui.vertical(|ui| {
+                            // Set a maximum width for the vertical component
+                            ui.set_max_width(ui.available_width());
+                            ui.heading(
+                                egui::RichText::new("Encoder")
+                                    .strong()
+                                    .size(18.0)
+                                    .color(egui::Color32::from_rgb(100, 200, 255)),
+                            );
+                            ui.label(
+                                egui::RichText::new(
+                                    "Encode and decode data in various formats (Base64, URL, Hex, etc.) to assist in crafting payloads and analyzing responses."
+                                )
+                                .size(14.0),
+                            );
+                        });
+                        ui.end_row();
+                    });
+
+                // Add spacing before the closing message
+                ui.add_space(30.0);
+
+                // Closing message or call to action
+                ui.label(
+                    egui::RichText::new(
+                        "Get started by selecting a tab above to explore Shadow Proxy's powerful features!"
+                    )
+                    .size(16.0)
+                    .color(egui::Color32::from_rgb(180, 180, 180)),
+                );
+
+                // Add a separator line
+                ui.add_space(10.0);
+                ui.separator();
+
+                // Optional: Add a small footer
+                ui.add_space(10.0);
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("Built with ❤️ by [Your Name or Team]")
+                            .size(12.0)
+                            .color(egui::Color32::from_rgb(150, 150, 150)),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.hyperlink_to(
+                            "Documentation",
+                            "https://your-documentation-link.com",
+                        );
+                        ui.label(" | ");
+                        ui.hyperlink_to(
+                            "GitHub",
+                            "https://github.com/zohaib2k2/shadowproxy_gui",
+                        );
+                    });
+                });
+
+                // Add extra space at the bottom to ensure content doesn't feel cramped
+                ui.add_space(20.0);
+            });
+        });
+    }
     //TODO: Implement recon like google dorking
     /// Displays the Google Dork capture tab.
     ///
     /// This function is responsible for rendering the UI elements related to
     /// capturing Google Dork search results.
-    fn capture_google_dork_tab(&self, ui: &mut egui::Ui) {
-        let mut dork_link_searcher = "".to_string();
+    fn capture_google_dork_tab(&mut self, ui: &mut egui::Ui) {
+        //let mut dork_link_searcher = "".to_string();
 
         ui.label("Google Dorks");
-        let aval_height = ui.available_height();
+        //let aval_height = ui.available_height();
 
-        ui.add(egui::TextEdit::singleline(&mut dork_link_searcher));
+        ui.add(egui::TextEdit::singleline( &mut self.dork_link_searcher));
+        
+        let max_height = ui.available_height() * (0.75);
+        // Make the table scroll-able both horizontally and vertically, you motherfucker.
+        
+        ScrollArea::both()
+            .id_source("dorkable_table_scroll")
+            .max_height(max_height)
+            .auto_shrink([false; 2])
+            .show(ui, |ui| {
+                egui::Grid::new("Dorking table")
+                    .striped(true)
+                    .min_col_width(20.0)
+                    .show(ui, |ui| {
+                        // "Its not death, but dying which is terriable"
+                        // -- Henry Fielding (1707)
+
+                        // Table headers
+                        ui.label("Index");
+                        ui.label("URL");
+                        ui.end_row();
+
+                        let log = self.dock_collector.lock().unwrap();
+
+                        for (index, entry) in log.iter().enumerate() {
+                            if self.stop_proxy {
+                                continue;
+                            }
+                            if entry.clone().contains(&self.dork_link_searcher.to_string()) {
+                                if ui.button(format!("{}", index + 1)).clicked() {
+                                    ui.output_mut( |o| o.copied_text = entry.to_string());
+                                }
+                                    
+                                    
+                                ui.label(entry);
+                                
+                                ui.end_row();
+                            }
+                        }
+                    });
+            });
+
+        ui.separator();
+       
     }
 
     /// Displays the Proxy tab, which captures and displays HTTP requests.
@@ -447,6 +668,116 @@ impl MyApp {
         });
     }
 
+    const CONTROLS: &AsciiSet = &percent_encoding::NON_ALPHANUMERIC
+    .remove(b'-')
+    .remove(b'_')
+    .remove(b'.')
+    .remove(b'~');
+
+    fn encoder_tab(&mut self, ui: &mut eframe::egui::Ui) {
+         ui.separator();
+
+        // Persistent state for the text input and output
+        static mut INPUT_TEXT: String = String::new();
+        static mut OUTPUT_TEXT: String = String::new();
+
+        let available_height = ui.available_height();
+        let available_width = ui.available_width();
+       
+         // Split the available space into two columns
+    egui::SidePanel::right("encoder_controls")
+        .resizable(false)
+        .default_width(150.0)
+        .show_inside(ui, |ui| {
+            ui.vertical(|ui| {
+                ui.set_height(available_height);
+                
+                // Encoding buttons
+                if ui.button("URL Encode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = utf8_percent_encode(&INPUT_TEXT, &CONTROLS).to_string();
+                    }
+                }
+                if ui.button("URL Decode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = urlencoding::decode(&INPUT_TEXT)
+                            .unwrap()
+                            .to_string();
+                    }
+                }
+                if ui.button("HTML Encode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = html_escape::encode_text(&INPUT_TEXT).to_string();
+                    }
+                }
+                if ui.button("HTML Decode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = html_escape::decode_html_entities(&INPUT_TEXT).to_string();
+                    }
+                }
+                if ui.button("Base64 Encode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = base64::encode(&INPUT_TEXT);
+                    }
+                }
+                if ui.button("Base64 Decode").clicked() {
+                    unsafe {
+                        OUTPUT_TEXT = base64::decode(&INPUT_TEXT)
+                            .map(|bytes| String::from_utf8_lossy(&bytes).to_string())
+                            .unwrap_or(INPUT_TEXT.clone());
+                    }
+                }
+                if ui.button("Clear").clicked() {
+                    unsafe {
+                        INPUT_TEXT.clear();
+                        OUTPUT_TEXT.clear();
+                    }
+                }
+            });
+        });
+
+    // Main content area with input and output text boxes
+    egui::CentralPanel::default().show_inside(ui, |ui| {
+        ui.horizontal(|ui| {
+            ui.set_height(available_height);
+            ui.set_width(available_width - 150.0); // Adjust for side panel width
+
+            // Input and output text areas side by side
+            ui.vertical(|ui| {
+                ui.label("Input:");
+                let input_response = ui.add(
+                    egui::TextEdit::multiline(unsafe { &mut INPUT_TEXT })
+                        .desired_rows(10)
+                        .desired_width((available_width - 170.0) / 2.0),
+                );
+
+                // Update input text when user types
+                if input_response.changed() {
+                    unsafe {
+                        INPUT_TEXT = INPUT_TEXT.clone();
+                    }
+                }
+            });
+
+            ui.add_space(10.0);
+
+            ui.vertical(|ui| {
+                ui.label("Output:");
+                ui.add(
+                    egui::TextEdit::multiline(unsafe { &mut OUTPUT_TEXT })
+                        .desired_rows(10)
+                        .desired_width((available_width - 170.0) / 2.0)
+                        .interactive(false), // Make output read-only
+                );
+            });
+        });
+    });
+    }
+
+    fn decoder_tab(&mut self, ui: &mut eframe::egui::Ui) {
+        ui.separator();
+    }
+
     fn update_selected_text(&mut self) {
         println!("\n\n\nupdate: {:?}", self.selected_repeater_request);
         println!(
@@ -528,6 +859,15 @@ impl MyApp {
                             },
                             Tab::Recon => {
                                 panic!("");
+                            },
+                            Tab::encoder => {
+                                todo!("implement a panic handler.")
+                            },
+                            Tab::decoder => {
+                                todo!("Implement a panic handler.")
+                            }
+                            Tab::Intro => {
+                                todo!("do nothing")
                             }
 
 

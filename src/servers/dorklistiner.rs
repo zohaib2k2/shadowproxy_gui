@@ -24,8 +24,8 @@ pub fn start_link_server(dork_store: Arc<Mutex<Vec<String>>>) {
                     //println!("Method: {}", method);
                     //println!("URL: {}", url);
 
-                    println!("{}", dork);
-                    //data_store.push(dork.to_string());
+                    //println!("{}", dork);
+                    data_store.push(dork.to_string());
                     // for debuging
                 } else {
                     println!("Missing one or more required fields");
