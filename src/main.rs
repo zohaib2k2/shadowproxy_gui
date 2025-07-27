@@ -285,12 +285,17 @@ impl MyApp {
                         ui.vertical(|ui| {
                             // Set a maximum width for the vertical component
                             ui.set_max_width(ui.available_width());
-                            ui.heading(
+                            let recon_heading_resp = ui.button(
                                 egui::RichText::new("Recon")
                                     .strong()
                                     .size(18.0)
                                     .color(egui::Color32::from_rgb(100, 200, 255)),
                             );
+
+                            
+                            if recon_heading_resp.clicked() {
+                                self.active_tab = Tab::Recon;
+                            }
                             ui.label(
                                 egui::RichText::new(
                                     "Discover and enumerate network targets with advanced reconnaissance tools. Scan for open ports, services, and vulnerabilities effortlessly."
@@ -303,12 +308,14 @@ impl MyApp {
                         ui.vertical(|ui| {
                             // Set a maximum width for the vertical component
                             ui.set_max_width(ui.available_width());
-                            ui.heading(
+                            if ui.button(
                                 egui::RichText::new("Proxy")
                                     .strong()
                                     .size(18.0)
                                     .color(egui::Color32::from_rgb(100, 200, 255)),
-                            );
+                            ).clicked() {
+                                self.active_tab = Tab::Proxy;
+                            }
                             ui.label(
                                 egui::RichText::new(
                                     "Intercept and analyze HTTP/HTTPS traffic in real-time. Modify requests and responses to test application behavior."
@@ -322,12 +329,14 @@ impl MyApp {
                         ui.vertical(|ui| {
                             // Set a maximum width for the vertical component
                             ui.set_max_width(ui.available_width());
-                            ui.heading(
+                            if ui.button(
                                 egui::RichText::new("Repeater")
                                     .strong()
                                     .size(18.0)
                                     .color(egui::Color32::from_rgb(100, 200, 255)),
-                            );
+                            ).clicked() {
+                                self.active_tab = Tab::Repeater;
+                            }
                             ui.label(
                                 egui::RichText::new(
                                     "Replay and tweak requests to test server responses. Perfect for debugging and exploring edge cases."
@@ -340,12 +349,14 @@ impl MyApp {
                         ui.vertical(|ui| {
                             // Set a maximum width for the vertical component
                             ui.set_max_width(ui.available_width());
-                            ui.heading(
+                            if ui.button(
                                 egui::RichText::new("Encoder")
                                     .strong()
                                     .size(18.0)
                                     .color(egui::Color32::from_rgb(100, 200, 255)),
-                            );
+                            ).clicked() {
+                                self.active_tab = Tab::encoder;
+                            }
                             ui.label(
                                 egui::RichText::new(
                                     "Encode and decode data in various formats (Base64, URL, Hex, etc.) to assist in crafting payloads and analyzing responses."
@@ -376,7 +387,7 @@ impl MyApp {
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
                     ui.label(
-                        egui::RichText::new("Built with ❤️ by [Your Name or Team]")
+                        egui::RichText::new("Built with ❤️ by Zohaib")
                             .size(12.0)
                             .color(egui::Color32::from_rgb(150, 150, 150)),
                     );
@@ -668,6 +679,21 @@ impl MyApp {
         });
     }
 
+    fn url_encode(&self, input: &str) -> String {
+        input
+            .bytes()
+            .map(|b| match b {
+                // Unreserved characters according to RFC 3986
+                b'A'..=b'Z' |
+                b'a'..=b'z' |
+                b'0'..=b'9' |
+                b'-' | b'_' | b'.' | b'~' => (b as char).to_string(),
+                _ => format!("%{:02X}", b),
+            })
+            .collect()
+    }
+
+
     const CONTROLS: &AsciiSet = &percent_encoding::NON_ALPHANUMERIC
     .remove(b'-')
     .remove(b'_')
@@ -695,7 +721,8 @@ impl MyApp {
                 // Encoding buttons
                 if ui.button("URL Encode").clicked() {
                     unsafe {
-                        OUTPUT_TEXT = utf8_percent_encode(&INPUT_TEXT, &CONTROLS).to_string();
+                        //OUTPUT_TEXT = utf8_percent_encode(&INPUT_TEXT, &CONTROLS).to_string();
+                        OUTPUT_TEXT = self.url_encode(&INPUT_TEXT);
                     }
                 }
                 if ui.button("URL Decode").clicked() {
@@ -750,7 +777,7 @@ impl MyApp {
                         .desired_rows(10)
                         .desired_width((available_width - 170.0) / 2.0),
                 );
-
+                //println!("{:?}",inp);
                 // Update input text when user types
                 if input_response.changed() {
                     unsafe {
